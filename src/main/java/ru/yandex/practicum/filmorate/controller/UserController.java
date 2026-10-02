@@ -43,7 +43,8 @@ public class UserController {
         log.info("Пользователь успешно добавлен. ID: {}, Email: {}", user.getId(), user.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
-    
+
+    // trailing whitespace fix placeholder
     @PutMapping
     public User updateUser(@RequestBody User user) {
         if (user.getId() == null) {
