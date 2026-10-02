@@ -43,40 +43,35 @@ public class UserController {
         log.info("Пользователь успешно добавлен. ID: {}, Email: {}", user.getId(), user.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
-
-    @PutMapping("/{id}")
-    public User updateUser(@Valid @RequestBody User user, @PathVariable Long userId) {
-        if (!userId.equals(user.getId())) {
-            log.warn("ID в URL и в теле запроса не совпадают: {} vs {}", userId, user.getId());
-            throw new IllegalArgumentException("ID в URL и теле запроса должны совпадать");
+    
+    @PutMapping
+    public User updateUser(@RequestBody User user) {
+        if (user.getId() == null) {
+            log.warn("Попытка обновления пользователя без ID");
+            throw new IllegalArgumentException("ID пользователя обязателен для обновления");
         }
 
-        var foundUserOptional = users.stream()
-                .filter(currentUser -> currentUser.getId().equals(userId))
+        var foundUser = users.stream()
+                .filter(u -> u.getId().equals(user.getId()))
                 .findFirst();
 
-        if (foundUserOptional.isEmpty()) {
-            log.warn("Попытка обновления пользователя с несуществующим ID: {}", userId);
-            throw new UserNotFoundException(userId);
+        if (foundUser.isEmpty()) {
+            log.warn("Попытка обновления пользователя с несуществующим ID: {}", user.getId());
+            throw new UserNotFoundException(user.getId());
         }
 
         validateUser(user);
 
-        var existingUser = foundUserOptional.get();
-
-        String nameToSet = user.getName();
-        if (nameToSet == null || nameToSet.isBlank()) {
-            nameToSet = user.getLogin();
-            log.debug("При обновлении имя пустое, использовано имя логина: {}", nameToSet);
-        }
-        existingUser.setName(nameToSet);
-        existingUser.setEmail(user.getEmail());
+        var existingUser = foundUser.get();
+        existingUser.setName(user.getName());
         existingUser.setLogin(user.getLogin());
+        existingUser.setEmail(user.getEmail());
         existingUser.setBirthday(user.getBirthday());
 
-        log.info("Пользователь обновлён. ID: {}", existingUser.getId());
+        log.info("Пользователь обновлён. ID: {}, Имя: {}", existingUser.getId(), existingUser.getName());
         return existingUser;
     }
+
 
     private void validateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {

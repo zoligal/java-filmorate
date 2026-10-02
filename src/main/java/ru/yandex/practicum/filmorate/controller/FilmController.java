@@ -38,22 +38,21 @@ public class FilmController {
         return ResponseEntity.status(HttpStatus.CREATED).body(film);
     }
 
-    @PutMapping("/{id}")
-    public Film updateFilm(@Valid @RequestBody Film film, @PathVariable Long id) {
-        if (!id.equals(film.getId())) {
-            log.warn("ID в URL и в теле запроса не совпадают: {} vs {}", id, film.getId());
-            throw new IllegalArgumentException(
-                    String.format("ID в URL и теле запроса должны совпадать: %d vs %d", id, film.getId())
-            );
+    @PutMapping
+    public Film updateFilm(@RequestBody Film film) {
+        // Проверяем, что ID передан
+        if (film.getId() == null) {
+            log.warn("Попытка обновления фильма без ID");
+            throw new IllegalArgumentException("ID фильма обязателен для обновления");
         }
 
         var foundFilm = films.stream()
-                .filter(f -> f.getId().equals(id))
+                .filter(f -> f.getId().equals(film.getId()))
                 .findFirst();
 
         if (foundFilm.isEmpty()) {
-            log.warn("Попытка обновления фильма с несуществующим ID: {}", id);
-            throw new FilmNotFoundException(id);
+            log.warn("Попытка обновления фильма с несуществующим ID: {}", film.getId());
+            throw new FilmNotFoundException(film.getId());
         }
 
         validateFilm(film);
@@ -67,6 +66,7 @@ public class FilmController {
         log.info("Фильм обновлён. ID: {}, Название: {}", existingFilm.getId(), existingFilm.getName());
         return existingFilm;
     }
+
 
     private void validateFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
