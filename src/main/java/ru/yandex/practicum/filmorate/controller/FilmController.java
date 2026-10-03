@@ -40,14 +40,15 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        // Проверяем, что ID передан
         if (film.getId() == null) {
-            log.warn("Попытка обновления фильма без ID");
-            throw new IllegalArgumentException("ID фильма обязателен для обновления");
+            log.warn("Попытка обновления фильма без ID в теле запроса");
+            throw new IllegalArgumentException(
+                    "В теле запроса не указан ID фильма (поле id) — он обязателен для операции обновления"
+            );
         }
 
         var foundFilm = films.stream()
-                .filter(f -> f.getId().equals(film.getId()))
+                .filter(currentFilm -> currentFilm.getId().equals(film.getId()))
                 .findFirst();
 
         if (foundFilm.isEmpty()) {

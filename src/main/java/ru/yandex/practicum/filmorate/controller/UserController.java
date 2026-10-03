@@ -48,12 +48,14 @@ public class UserController {
     @PutMapping
     public User updateUser(@RequestBody User user) {
         if (user.getId() == null) {
-            log.warn("Попытка обновления пользователя без ID");
-            throw new IllegalArgumentException("ID пользователя обязателен для обновления");
+            log.warn("Попытка обновления пользователя без ID в теле запроса. User={}", user);
+            throw new IllegalArgumentException(
+                    "В теле запроса не указан ID пользователя (поле id) — он обязателен для операции обновления"
+            );
         }
 
         var foundUser = users.stream()
-                .filter(u -> u.getId().equals(user.getId()))
+                .filter(currentUser -> currentUser.getId().equals(user.getId()))
                 .findFirst();
 
         if (foundUser.isEmpty()) {
