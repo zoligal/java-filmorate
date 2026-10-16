@@ -6,13 +6,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/films")
@@ -20,54 +22,68 @@ import java.util.List;
 @Validated
 public class FilmController {
 
-    private Long nextId = 1L;
-    private final List<Film> films = new ArrayList<>();
+    private final FilmService filmService;
+
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @GetMapping
     public List<Film> getAllFilms() {
-        log.info("Запрос на получение всех фильмов. Всего: {}", films.size());
-        return new ArrayList<>(films);
+        log.info("Запрос на получение всех фильмов");
+        return filmService.getAll();
     }
 
     @PostMapping
     public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) {
         validateFilm(film);
-        film.setId(nextId++);
-        films.add(film);
-        log.info("Фильм успешно добавлен. ID: {}, Название: {}", film.getId(), film.getName());
-        return ResponseEntity.status(HttpStatus.CREATED).body(film);
+
+        Film created = filmService.add(film);
+        log.info("Фильм успешно добавлен. ID: {}, Название: {}", created.getId(), created.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         if (film.getId() == null) {
             log.warn("Попытка обновления фильма без ID в теле запроса");
-            throw new IllegalArgumentException(
-                    "В теле запроса не указан ID фильма (поле id) — он обязателен для операции обновления"
-            );
-        }
-
-        var foundFilm = films.stream()
-                .filter(currentFilm -> currentFilm.getId().equals(film.getId()))
-                .findFirst();
-
-        if (foundFilm.isEmpty()) {
-            log.warn("Попытка обновления фильма с несуществующим ID: {}", film.getId());
-            throw new FilmNotFoundException(film.getId());
+            throw new IllegalArgumentException("В теле запроса не указан ID фильма (поле id) — он обязателен для операции обновления");
         }
 
         validateFilm(film);
 
-        var existingFilm = foundFilm.get();
-        existingFilm.setName(film.getName());
-        existingFilm.setDescription(film.getDescription());
-        existingFilm.setReleaseDate(film.getReleaseDate());
-        existingFilm.setDuration(film.getDuration());
-
-        log.info("Фильм обновлён. ID: {}, Название: {}", existingFilm.getId(), existingFilm.getName());
-        return existingFilm;
+        Film updated = filmService.update(film);
+        log.info("Фильм обновлён. ID: {}, Название: {}", updated.getId(), updated.getName());
+        return updated;
     }
 
+    @GetMapping("/{id}")
+    public Film getById(@PathVariable long id) {
+        log.info("Запрос на получение фильма с ID: {}", id);
+        return filmService.getById(id)
+                .orElseThrow(() -> new FilmNotFoundException(id));
+    }
+
+    @PutMapping("/{id}/likes/{userId}")
+    public void addLike(@PathVariable long id, @PathVariable long userId) {
+        log.info("Пользователь {} ставит лайк фильму {}", userId, id);
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/likes/{userId}")
+    public void removeLike(@PathVariable long id, @PathVariable long userId) {
+        log.info("Пользователь {} убирает лайк с фильма {}", userId, id);
+        filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        log.info("Запрос топ-{} популярных фильмов", count);
+        if (count <= 0) {
+            throw new ValidationException("Параметр count должен быть положительным числом");
+        }
+        return filmService.getTopNFilms(count);
+    }
 
     private void validateFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
