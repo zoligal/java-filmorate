@@ -55,6 +55,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(FriendshipNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException exception ) {
+        log.warn("Friendship not found: {}", exception.getMessage());
+        Map<String, Object> body = createErrorBody(
+                HttpStatus.NOT_FOUND,
+                exception.getMessage()
+        );
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception exception) {
         log.error("Unexpected error", exception);

@@ -37,7 +37,8 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidUser)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("Email должен быть корректным"));
+                // Было: jsonPath("$.email").value(...)
+                .andExpect(MockMvcResultMatchers.jsonPath("$.details.email").value("Email должен быть корректным"));
     }
 
     @Test
@@ -52,10 +53,10 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(oldFilm)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.releaseDate").value(
+                // Было: jsonPath("$.releaseDate").value(...)
+                .andExpect(MockMvcResultMatchers.jsonPath("$.details.releaseDate").value(
                         "Дата релиза не может быть раньше 28.12.1895"));
     }
-
 
     @Test
     void validUserReturnsCreated() throws Exception {
