@@ -45,13 +45,10 @@ public class FilmController {
 
     @PutMapping("/{id}")
     public Film updateFilm(@PathVariable long id, @RequestBody Film film) {
-        if (film.getId() == null) {
-            throw new ValidationException("ID фильма должен быть указан в теле запроса");
-        }
-
+        film.setId(id);
         validateFilm(film);
-
         Film updated = filmService.update(film);
+
         log.info("Фильм обновлён. ID: {}, Название: {}", updated.getId(), updated.getName());
         return updated;
     }
@@ -86,26 +83,34 @@ public class FilmController {
     }
 
     private void validateFilm(Film film) {
+
         if (film.getName() == null || film.getName().isBlank()) {
             log.error("Название фильма пустое");
             throw new ValidationException("Название не может быть пустым");
         }
+
         if (film.getDescription() != null && film.getDescription().length() > 200) {
             log.error("Описание длиннее 200 символов: {}", film.getDescription().length());
             throw new ValidationException(
                     String.format("Максимальная длина описания — 200 символов (текущая длина: %d)", film.getDescription().length())
             );
         }
+
         LocalDate minDate = LocalDate.of(1895, 12, 28);
-        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(minDate)) {
-            log.error("Дата релиза раньше 28.12.1895: {}", film.getReleaseDate());
-            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
+        if (film.getReleaseDate() != null) {
+            if (film.getReleaseDate().isBefore(minDate)) {
+                log.error("Дата релиза раньше 28.12.1895: {}", film.getReleaseDate());
+                throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
+            }
         }
-        if (film.getDuration() == null || film.getDuration() <= 0) {
-            log.error("Продолжительность фильма неположительная: {}", film.getDuration());
-            throw new ValidationException(
-                    String.format("Продолжительность фильма должна быть положительным числом (текущее значение: %d)", film.getDuration())
-            );
+
+        if (film.getDuration() != null) {
+            if (film.getDuration() <= 0) {
+                log.error("Продолжительность фильма неположительная: {}", film.getDuration());
+                throw new ValidationException(
+                        String.format("Продолжительность фильма должна быть положительным числом (текущее значение: %d)", film.getDuration())
+                );
+            }
         }
     }
 }
