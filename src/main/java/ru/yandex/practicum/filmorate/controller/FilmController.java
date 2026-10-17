@@ -8,11 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 
@@ -36,8 +34,6 @@ public class FilmController {
 
     @PostMapping
     public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) {
-        validateFilm(film);
-
         Film created = filmService.add(film);
         log.info("Фильм успешно добавлен. ID: {}, Название: {}", created.getId(), created.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
@@ -46,9 +42,7 @@ public class FilmController {
     @PutMapping("/{id}")
     public Film updateFilm(@PathVariable long id, @RequestBody Film film) {
         film.setId(id);
-        validateFilm(film);
         Film updated = filmService.update(film);
-
         log.info("Фильм обновлён. ID: {}, Название: {}", updated.getId(), updated.getName());
         return updated;
     }
@@ -61,13 +55,13 @@ public class FilmController {
                 .orElseThrow(() -> new FilmNotFoundException(id));
     }
 
-    @PutMapping("/{id}/likes/{userId}")
+    @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable long id, @PathVariable long userId) {
         log.info("Пользователь {} ставит лайк фильму {}", userId, id);
         filmService.addLike(id, userId);
     }
 
-    @DeleteMapping("/{id}/likes/{userId}")
+    @DeleteMapping("/{id}/like/{userId}")
     public void removeLike(@PathVariable long id, @PathVariable long userId) {
         log.info("Пользователь {} убирает лайк с фильма {}", userId, id);
         filmService.removeLike(id, userId);
@@ -77,40 +71,9 @@ public class FilmController {
     public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
         log.info("Запрос топ-{} популярных фильмов", count);
         if (count <= 0) {
-            throw new ValidationException("Параметр count должен быть положительным числом");
+            throw new IllegalArgumentException("Параметр count должен быть положительным числом");
         }
         return filmService.getTopNFilms(count);
     }
 
-    private void validateFilm(Film film) {
-
-        if (film.getName() == null || film.getName().isBlank()) {
-            log.error("Название фильма пустое");
-            throw new ValidationException("Название не может быть пустым");
-        }
-
-        if (film.getDescription() != null && film.getDescription().length() > 200) {
-            log.error("Описание длиннее 200 символов: {}", film.getDescription().length());
-            throw new ValidationException(
-                    String.format("Максимальная длина описания — 200 символов (текущая длина: %d)", film.getDescription().length())
-            );
-        }
-
-        LocalDate minDate = LocalDate.of(1895, 12, 28);
-        if (film.getReleaseDate() != null) {
-            if (film.getReleaseDate().isBefore(minDate)) {
-                log.error("Дата релиза раньше 28.12.1895: {}", film.getReleaseDate());
-                throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
-            }
-        }
-
-        if (film.getDuration() != null) {
-            if (film.getDuration() <= 0) {
-                log.error("Продолжительность фильма неположительная: {}", film.getDuration());
-                throw new ValidationException(
-                        String.format("Продолжительность фильма должна быть положительным числом (текущее значение: %d)", film.getDuration())
-                );
-            }
-        }
-    }
 }

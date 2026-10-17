@@ -15,13 +15,6 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationException(ValidationException exception) {
-        log.warn("Validation error: {}", exception.getMessage());
-        Map<String, Object> body = createErrorBody(HttpStatus.BAD_REQUEST, exception.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException exception) {
         log.warn("Illegal argument error: {}", exception.getMessage());

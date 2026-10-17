@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 
 import java.util.List;
@@ -42,7 +41,7 @@ public class FilmService {
 
     public Film update(Film film) {
         if (film.getId() == null) {
-            throw new ValidationException("ID фильма не может быть null при обновлении");
+            throw new IllegalArgumentException("ID фильма не может быть null при обновлении");
         }
 
         if (!filmStorage.getById(film.getId()).isPresent()) {
@@ -107,7 +106,7 @@ public class FilmService {
 
         if (count <= 0) {
             log.warn("Некорректный параметр count={}. Должен быть > 0", count);
-            throw new ValidationException("Параметр count должен быть положительным числом");
+            throw new IllegalArgumentException("Параметр count должен быть положительным числом");
         }
 
         List<Film> top = filmStorage.getAll().stream()
