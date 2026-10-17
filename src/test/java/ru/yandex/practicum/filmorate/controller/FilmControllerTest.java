@@ -56,6 +56,7 @@ class FilmControllerTest {
         assertThrows(ValidationException.class, () -> controller.createFilm(invalidFilm));
     }
 
+
     @Test
     void nonPositiveDurationThrows() {
         FilmService filmService = Mockito.mock(FilmService.class);

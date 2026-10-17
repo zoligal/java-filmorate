@@ -22,6 +22,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException exception) {
+        log.warn("Illegal argument error: {}", exception.getMessage());
+        Map<String, Object> body = createErrorBody(HttpStatus.BAD_REQUEST, exception.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException exception) {
         log.warn("User not found: {}", exception.getId());
