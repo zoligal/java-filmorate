@@ -43,11 +43,10 @@ public class FilmController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
+    @PutMapping("/{id}")
+    public Film updateFilm(@PathVariable long id, @RequestBody Film film) {
         if (film.getId() == null) {
-            log.warn("Попытка обновления фильма без ID в теле запроса");
-            throw new IllegalArgumentException("В теле запроса не указан ID фильма (поле id) — он обязателен для операции обновления");
+            throw new ValidationException("ID фильма должен быть указан в теле запроса");
         }
 
         validateFilm(film);
@@ -56,6 +55,7 @@ public class FilmController {
         log.info("Фильм обновлён. ID: {}, Название: {}", updated.getId(), updated.getName());
         return updated;
     }
+
 
     @GetMapping("/{id}")
     public Film getById(@PathVariable long id) {

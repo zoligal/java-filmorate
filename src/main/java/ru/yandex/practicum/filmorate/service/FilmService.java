@@ -41,6 +41,13 @@ public class FilmService {
     }
 
     public Film update(Film film) {
+        if (film.getId() == null) {
+            throw new ValidationException("ID фильма не может быть null при обновлении");
+        }
+
+        if (!filmStorage.getById(film.getId()).isPresent()) {
+            throw new FilmNotFoundException(film.getId());
+        }
         return filmStorage.update(film);
     }
 
