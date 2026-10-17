@@ -25,20 +25,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException exception) {
         log.warn("User not found: {}", exception.getId());
-        Map<String, Object> body = createErrorBody(
-                HttpStatus.NOT_FOUND,
-                String.format("User with id %d not found", exception.getId())
-        );
+        String message = String.format("User with id %d not found", exception.getId());
+        Map<String, Object> body = createErrorBody(HttpStatus.NOT_FOUND, message);
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    // Оставляем только этот вариант для FilmNotFoundException
     @ExceptionHandler(FilmNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleFilmNotFound(FilmNotFoundException exception) {
         log.warn("Film not found: {}", exception.getId());
-        Map<String, Object> body = createErrorBody(
-                HttpStatus.NOT_FOUND,
-                String.format("Film with id %d not found", exception.getId())
-        );
+        String message = String.format("Film with id %d not found", exception.getId());
+        Map<String, Object> body = createErrorBody(HttpStatus.NOT_FOUND, message);
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
@@ -58,10 +55,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FriendshipNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException exception) {
         log.warn("Friendship not found: {}", exception.getMessage());
-        Map<String, Object> body = createErrorBody(
-                HttpStatus.NOT_FOUND,
-                exception.getMessage()
-        );
+        Map<String, Object> body = createErrorBody(HttpStatus.NOT_FOUND, exception.getMessage());
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 

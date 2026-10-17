@@ -40,11 +40,13 @@ public class FilmController {
     }
 
     @PutMapping("/{id}")
-    public Film updateFilm(@PathVariable long id, @RequestBody Film film) {
-        film.setId(id);
-        Film updated = filmService.update(film);
+    public ResponseEntity<Film> updateFilm(@PathVariable long id, @Valid @RequestBody Film filmDto) {
+        filmDto.setId(id);
+
+        Film updated = filmService.update(filmDto);
         log.info("Фильм обновлён. ID: {}, Название: {}", updated.getId(), updated.getName());
-        return updated;
+
+        return ResponseEntity.ok(updated);
     }
 
 
