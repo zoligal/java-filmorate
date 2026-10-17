@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(FriendshipNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException exception ) {
+    public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException exception) {
         log.warn("Friendship not found: {}", exception.getMessage());
         Map<String, Object> body = createErrorBody(
                 HttpStatus.NOT_FOUND,
