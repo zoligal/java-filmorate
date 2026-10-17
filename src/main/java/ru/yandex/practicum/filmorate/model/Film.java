@@ -26,5 +26,5 @@ public class Film {
     @Positive(message = "Продолжительность должна быть положительной")
     Integer duration;
 
-    Double rating;
+    Double rate;
 }

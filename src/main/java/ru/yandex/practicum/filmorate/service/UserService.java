@@ -28,7 +28,9 @@ public class UserService {
     }
 
     public List<User> getAll() {
-        return userStorage.getAll();
+        List<User> users = userStorage.getAll();
+        users.sort((u1, u2) -> Long.compare(u1.getId(), u2.getId()));
+        return users;
     }
 
     public User add(User user) {
