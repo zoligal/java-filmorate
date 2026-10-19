@@ -7,12 +7,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/films")
@@ -47,33 +45,27 @@ public class FilmController {
         return updated;
     }
 
-
     @GetMapping("/{id}")
     public Film getById(@PathVariable long id) {
-        log.info("Запрос на получение фильма с ID: {}", id);
-        return filmService.getById(id)
-                .orElseThrow(() -> new FilmNotFoundException(id));
+        return filmService.getById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable long id, @PathVariable long userId) {
-        log.info("Пользователь {} ставит лайк фильму {}", userId, id);
+    public ResponseEntity<Void> addLike(@PathVariable Long id, @PathVariable Long userId) {
         filmService.addLike(id, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public void removeLike(@PathVariable long id, @PathVariable long userId) {
-        log.info("Пользователь {} убирает лайк с фильма {}", userId, id);
+    public ResponseEntity<Void> removeLike(@PathVariable Long id, @PathVariable Long userId) {
         filmService.removeLike(id, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        log.info("Запрос топ-{} популярных фильмов", count);
-        if (count <= 0) {
-            throw new IllegalArgumentException("Параметр count должен быть положительным числом");
-        }
-        return filmService.getTopNFilms(count);
+    public ResponseEntity<List<Film>> getPopular(@RequestParam(required = false) Integer count) {
+        List<Film> popular = filmService.getPopular(count);
+        return ResponseEntity.ok(popular);
     }
 
 }

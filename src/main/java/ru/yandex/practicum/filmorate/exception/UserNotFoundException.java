@@ -4,7 +4,7 @@ public class UserNotFoundException extends RuntimeException {
     private final long id;
 
     public UserNotFoundException(long id) {
-        super(String.format("User with id %d not found", id));
+        super(String.format("Пользователь с id %d не найден", id));
         this.id = id;
     }
 

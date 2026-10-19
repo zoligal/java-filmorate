@@ -1,20 +1,17 @@
 package ru.yandex.practicum.filmorate.service;
 
+import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-
-import java.util.Optional;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.exception.InvalidCountException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import java.util.List;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
@@ -50,8 +47,9 @@ public class FilmService {
         return filmStorage.update(film);
     }
 
-    public Optional<Film> getById(long id) {
-        return filmStorage.getById(id);
+    public Film getById(long id) {
+        return filmStorage.getById(id)
+                .orElseThrow(() -> new FilmNotFoundException(id));
     }
 
     public void addLike(long filmId, long userId) {
@@ -59,45 +57,42 @@ public class FilmService {
 
         validateFilmExists(filmId);
 
-        Set<Long> likes = likesMap.computeIfAbsent(filmId, k -> new HashSet<>());
+        Film film = filmStorage.getById(filmId)
+                .orElseThrow(() -> new FilmNotFoundException(filmId));
 
-        boolean isNewLike = likes.add(userId);
-
-        if (isNewLike) {
-            log.debug("Лайк успешно поставлен: filmId={}, userId={}", filmId, userId);
-        } else {
-            log.debug("Пользователь уже поставил лайк этому фильму: filmId={}, userId={}", filmId, userId);
+        if (film.getLikes().contains(userId)) {
+            throw new ValidationException("Пользователь уже поставил лайк этому фильму");
         }
+
+        film.getLikes().add(userId);
+        filmStorage.update(film);
+
+        likesMap.computeIfAbsent(filmId, k -> new HashSet<>()).add(userId);
+
+        log.debug("Лайк успешно поставлен: filmId={}, userId={}", filmId, userId);
     }
 
     public void removeLike(long filmId, long userId) {
         log.debug("Запрос на удаление лайка: filmId={}, userId={}", filmId, userId);
 
         validateFilmExists(filmId);
+        Film film = filmStorage.getById(filmId).get();
+        boolean wasRemoved = film.getLikes().remove(userId);
 
-        Set<Long> usersWhoLiked = likesMap.get(filmId);
-        if (usersWhoLiked == null || !usersWhoLiked.contains(userId)) {
-            log.debug("Лайк не найден для удаления: filmId={}, userId={}. Лайка не было.", filmId, userId);
-            return;
+        if (!wasRemoved) {
+            throw new LikeNotFoundException(filmId, userId);
         }
 
-        usersWhoLiked.remove(userId);
-        log.debug("Лайк удалён: filmId={}, userId={}", filmId, userId);
-
-        if (usersWhoLiked.isEmpty()) {
-            log.debug("У фильма больше нет лайков, удаляем запись из likesMap: filmId={}", filmId);
-            likesMap.remove(filmId);
-        }
+        filmStorage.update(film);
+        log.debug("Лайк успешно удалён: filmId={}, userId={}", filmId, userId);
     }
 
-    public List<Film> getTop10Films() {
+    public List<Film> getPopular(Integer count) {
+        int limit = (count == null || count <= 0) ? 10 : count;
+
         return filmStorage.getAll().stream()
-                .sorted((f1, f2) -> {
-                    int likes1 = getLikesCount(f1.getId());
-                    int likes2 = getLikesCount(f2.getId());
-                    return Integer.compare(likes2, likes1);
-                })
-                .limit(10)
+                .sorted(Comparator.comparing(f -> f.getLikes().size(), Comparator.reverseOrder()))
+                .limit(limit)
                 .collect(Collectors.toList());
     }
 
@@ -106,7 +101,7 @@ public class FilmService {
 
         if (count <= 0) {
             log.warn("Некорректный параметр count={}. Должен быть > 0", count);
-            throw new IllegalArgumentException("Параметр count должен быть положительным числом");
+            throw new InvalidCountException("Параметр count должен быть положительным числом");
         }
 
         List<Film> top = filmStorage.getAll().stream()
@@ -130,4 +125,5 @@ public class FilmService {
             throw new FilmNotFoundException(id);
         }
     }
+
 }

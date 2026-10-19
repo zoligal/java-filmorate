@@ -4,9 +4,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,6 +35,10 @@ public class UserService {
     }
 
     public User add(User user) {
+        if (user == null) throw new IllegalArgumentException("Пользователь не должен быть равен null");
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin()); // нормализация здесь
+        }
         return userStorage.add(user);
     }
 
@@ -41,21 +46,26 @@ public class UserService {
         return userStorage.update(user);
     }
 
-    public Optional<User> getById(long id) {
-        return userStorage.getById(id);
+    public User getById(long id) {
+        return userStorage.getById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public void addFriend(long userId, long friendId) {
         log.debug("Попытка добавить дружбу: userId={}, friendId={}", userId, friendId);
+
         if (userId == friendId) {
-            log.warn("Попытка добавить пользователя в друзья самому себе: userId={}", userId);
-            throw new IllegalArgumentException("User cannot be friend with themselves");
+            log.warn("Попытка добавить себя в друзья: userId={}", userId);
+            throw new BadRequestException("Нельзя добавить себя в друзья");
         }
+
         validateUserExists(userId);
         validateUserExists(friendId);
 
         friendsMap.computeIfAbsent(userId, k -> new HashSet<>()).add(friendId);
         friendsMap.computeIfAbsent(friendId, k -> new HashSet<>()).add(userId);
+
+        log.info("Дружба между {} и {} успешно добавлена", userId, friendId);
     }
 
     public void removeFriend(long userId, long friendId) {
@@ -109,6 +119,7 @@ public class UserService {
             throw new UserNotFoundException(id);
         }
     }
+
 
     private boolean hasFriendship(long userId, long friendId) {
         Set<Long> friends = friendsMap.getOrDefault(userId, Collections.emptySet());
