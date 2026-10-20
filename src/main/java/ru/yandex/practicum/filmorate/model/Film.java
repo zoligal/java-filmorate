@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 import ru.yandex.practicum.filmorate.validation.ReleaseDate;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = "id")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Film {
     Long id;
 
