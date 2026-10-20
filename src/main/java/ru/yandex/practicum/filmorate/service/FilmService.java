@@ -35,8 +35,6 @@ public class FilmService {
     public Film add(Film film) {
         return filmStorage.add(film);
     }
-
-
     public Film update(Film film) {
         if (film.getId() == null) {
             throw new IllegalArgumentException("ID фильма не может быть null при обновлении");

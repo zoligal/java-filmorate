@@ -31,15 +31,13 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.put(id, film);
         return film;
     }
-
     @Override
     public Film update(Film film) {
         if (film == null || film.getId() == null) {
-            throw new IllegalArgumentException("Фильм и его ID не должны быть равны null");
+            throw new IllegalArgumentException("Фильм и его ID не должны быть null");
         }
-
         Long filmId = film.getId();
-
+        
         if (!films.containsKey(filmId)) {
             throw new FilmNotFoundException(filmId);
         }
