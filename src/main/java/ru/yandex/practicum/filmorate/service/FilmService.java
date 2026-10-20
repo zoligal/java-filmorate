@@ -36,15 +36,29 @@ public class FilmService {
         return filmStorage.add(film);
     }
 
+
     public Film update(Film film) {
         if (film.getId() == null) {
             throw new IllegalArgumentException("ID фильма не может быть null при обновлении");
         }
 
-        if (!filmStorage.getById(film.getId()).isPresent()) {
-            throw new FilmNotFoundException(film.getId());
+        Film existingFilm = filmStorage.getById(film.getId())
+                .orElseThrow(() -> new FilmNotFoundException(film.getId()));
+
+        if (film.getName() != null) {
+            existingFilm.setName(film.getName());
         }
-        return filmStorage.update(film);
+        if (film.getDescription() != null) {
+            existingFilm.setDescription(film.getDescription());
+        }
+        if (film.getReleaseDate() != null) {
+            existingFilm.setReleaseDate(film.getReleaseDate());
+        }
+        if (film.getDuration() != null) {
+            existingFilm.setDuration(film.getDuration());
+        }
+
+        return filmStorage.update(existingFilm);
     }
 
     public Film getById(long id) {
