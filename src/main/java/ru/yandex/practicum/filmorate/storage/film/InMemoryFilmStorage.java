@@ -37,7 +37,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new IllegalArgumentException("Фильм и его ID не должны быть null");
         }
         Long filmId = film.getId();
-        
+
         if (!films.containsKey(filmId)) {
             throw new FilmNotFoundException(filmId);
         }
