@@ -36,7 +36,27 @@ public class FilmService {
         return filmStorage.add(film);
     }
 
-    
+    public void addLike(long filmId, long userId) {
+        log.debug("Ставим лайк: filmId={}, userId={}", filmId, userId);
+
+        validateFilmExists(filmId);
+
+        Film film = filmStorage.getById(filmId)
+                .orElseThrow(() -> new FilmNotFoundException(filmId));
+
+        if (film.getLikes().contains(userId)) {
+            throw new ValidationException("Пользователь уже поставил лайк этому фильму");
+        }
+
+        film.getLikes().add(userId);
+        filmStorage.update(film);
+
+        likesMap.computeIfAbsent(filmId, k -> new HashSet<>()).add(userId);
+
+        log.debug("Лайк успешно поставлен: filmId={}, userId={}", filmId, userId);
+    }
+
+
     public Film update(Film film) {
         if (film.getId() == null) {
             throw new IllegalArgumentException("ID фильма не может быть null при обновлении");
@@ -64,26 +84,6 @@ public class FilmService {
     public Film getById(long id) {
         return filmStorage.getById(id)
                 .orElseThrow(() -> new FilmNotFoundException(id));
-    }
-
-    public void addLike(long filmId, long userId) {
-        log.debug("Ставим лайк: filmId={}, userId={}", filmId, userId);
-
-        validateFilmExists(filmId);
-
-        Film film = filmStorage.getById(filmId)
-                .orElseThrow(() -> new FilmNotFoundException(filmId));
-
-        if (film.getLikes().contains(userId)) {
-            throw new ValidationException("Пользователь уже поставил лайк этому фильму");
-        }
-
-        film.getLikes().add(userId);
-        filmStorage.update(film);
-
-        likesMap.computeIfAbsent(filmId, k -> new HashSet<>()).add(userId);
-
-        log.debug("Лайк успешно поставлен: filmId={}, userId={}", filmId, userId);
     }
 
     public void removeLike(long filmId, long userId) {
