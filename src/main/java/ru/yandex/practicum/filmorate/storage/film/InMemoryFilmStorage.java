@@ -33,16 +33,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getAll() {
-        return new ArrayList<>(films.values());
-    }
-
-    @Override
-    public void delete(long id) {
-        films.remove(id);
-    }
-    
-    @Override
     public Film update(Film film) {
         if (film == null || film.getId() == null) {
             throw new IllegalArgumentException("Фильм и его ID не должны быть null");
@@ -55,5 +45,15 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.put(filmId, film);
 
         return films.get(filmId);
+    }
+
+    @Override
+    public List<Film> getAll() {
+        return new ArrayList<>(films.values());
+    }
+
+    @Override
+    public void delete(long id) {
+        films.remove(id);
     }
 }
