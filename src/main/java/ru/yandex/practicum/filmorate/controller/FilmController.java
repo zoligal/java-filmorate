@@ -38,11 +38,10 @@ public class FilmController {
     }
 
     @PutMapping("/{id}")
-    public Film updateFilm(@PathVariable long id, @RequestBody Film film) {
+    public Film putFilm(@PathVariable long id, @Valid @RequestBody Film film) {
         film.setId(id);
-        Film updated = filmService.update(film);
-        log.info("Фильм обновлён. ID: {}, Название: {}", updated.getId(), updated.getName());
-        return updated;
+        var result = filmService.update(film);
+        return result;
     }
 
     @GetMapping("/{id}")
@@ -52,6 +51,7 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public ResponseEntity<Void> addLike(@PathVariable Long id, @PathVariable Long userId) {
+        System.out.println(">>> PUT ЗАПРОШЕН: id=" + id);
         filmService.addLike(id, userId);
         return ResponseEntity.noContent().build();
     }

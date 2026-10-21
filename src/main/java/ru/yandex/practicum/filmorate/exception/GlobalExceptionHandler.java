@@ -78,16 +78,22 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(createErrorBody(HttpStatus.NOT_FOUND, exception.getMessage()), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleAnyException(Exception exception) {
+        log.error("ПОЛНЫЙ СТЕК ОШИБКИ", exception);
+
+        var body = Map.of(
+                "error", "Internal Server Error",
+                "message", "Произошла непредвиденная ошибка"
+        );
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleUserAlreadyExists(UserAlreadyExistsException exception) {
         log.warn("User already exists / friendship already exists: {}", exception.getMessage());
         return new ResponseEntity<>(createErrorBody(HttpStatus.CONFLICT, exception.getMessage()), HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneric(Exception exception) {
-        log.error("Unexpected error", exception);
-        return new ResponseEntity<>(createErrorBody(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     private Map<String, Object> createErrorBody(HttpStatus status, String message) {

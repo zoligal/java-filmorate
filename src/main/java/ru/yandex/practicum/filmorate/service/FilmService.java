@@ -7,6 +7,9 @@ import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.InvalidCountException;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +23,14 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
     private final ConcurrentMap<Long, Set<Long>> likesMap = new ConcurrentHashMap<>();
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
 
 
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
     public List<Film> getAll() {
@@ -40,9 +45,11 @@ public class FilmService {
         log.debug("Ставим лайк: filmId={}, userId={}", filmId, userId);
 
         validateFilmExists(filmId);
-
         Film film = filmStorage.getById(filmId)
                 .orElseThrow(() -> new FilmNotFoundException(filmId));
+
+        User user = userStorage.getById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден"));
 
         if (film.getLikes().contains(userId)) {
             throw new ValidationException("Пользователь уже поставил лайк этому фильму");
@@ -56,29 +63,15 @@ public class FilmService {
         log.debug("Лайк успешно поставлен: filmId={}, userId={}", filmId, userId);
     }
 
-
     public Film update(Film film) {
+        if (film == null) {
+            throw new IllegalArgumentException("Фильм не может быть null при обновлении");
+        }
         if (film.getId() == null) {
             throw new IllegalArgumentException("ID фильма не может быть null при обновлении");
         }
 
-        Film existingFilm = filmStorage.getById(film.getId())
-                .orElseThrow(() -> new FilmNotFoundException(film.getId()));
-
-        if (film.getName() != null) {
-            existingFilm.setName(film.getName());
-        }
-        if (film.getDescription() != null) {
-            existingFilm.setDescription(film.getDescription());
-        }
-        if (film.getReleaseDate() != null) {
-            existingFilm.setReleaseDate(film.getReleaseDate());
-        }
-        if (film.getDuration() != null) {
-            existingFilm.setDuration(film.getDuration());
-        }
-
-        return filmStorage.update(existingFilm);
+        return filmStorage.update(film);
     }
 
     public Film getById(long id) {
@@ -139,5 +132,4 @@ public class FilmService {
             throw new FilmNotFoundException(id);
         }
     }
-
 }

@@ -37,15 +37,23 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film == null || film.getId() == null) {
             throw new IllegalArgumentException("Фильм и его ID не должны быть null");
         }
+
         Long filmId = film.getId();
 
         if (!films.containsKey(filmId)) {
             throw new FilmNotFoundException(filmId);
         }
-        films.put(filmId, film);
 
-        return films.get(filmId);
+        Film existing = films.get(filmId);
+
+        if (film.getName() != null) existing.setName(film.getName());
+        if (film.getDescription() != null) existing.setDescription(film.getDescription());
+        if (film.getReleaseDate() != null) existing.setReleaseDate(film.getReleaseDate());
+        if (film.getDuration() != null) existing.setDuration(film.getDuration());
+
+        return existing;
     }
+
 
     @Override
     public List<Film> getAll() {

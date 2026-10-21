@@ -39,7 +39,6 @@ class FilmControllerIntegrationTest {
         Film film = new Film();
         film.setName("Old Movie");
         film.setDescription("Too old movie");
-        // По ТЗ Filmorate минимальная дата — 1895-12-28
         film.setReleaseDate(LocalDate.of(1800, 1, 1));
         film.setDuration(90);
         return film;

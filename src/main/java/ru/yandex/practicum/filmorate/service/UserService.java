@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -37,7 +36,7 @@ public class UserService {
     public User add(User user) {
         if (user == null) throw new IllegalArgumentException("Пользователь не должен быть равен null");
         if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin()); // нормализация здесь
+            user.setName(user.getLogin());
         }
         return userStorage.add(user);
     }
@@ -70,16 +69,21 @@ public class UserService {
 
     public void removeFriend(long userId, long friendId) {
         log.debug("Попытка удалить дружбу: userId={}, friendId={}", userId, friendId);
+
         if (!hasFriendship(userId, friendId)) {
-            log.warn("Попытка удалить несуществующую дружбу: userId={}, friendId={}", userId, friendId);
-            throw new FriendshipNotFoundException(userId, friendId);
+            log.warn("Попытка удалить несуществующую дружбу: userId={}, friendId={}. Ничего не делаем.", userId, friendId);
+            return;
         }
 
         Set<Long> userFriends = friendsMap.get(userId);
         Set<Long> friendFriends = friendsMap.get(friendId);
 
-        if (userFriends != null) userFriends.remove(friendId);
-        if (friendFriends != null) friendFriends.remove(userId);
+        if (userFriends != null) {
+            userFriends.remove(friendId);
+        }
+        if (friendFriends != null) {
+            friendFriends.remove(userId);
+        }
 
         cleanupIfEmpty(userId);
         cleanupIfEmpty(friendId);
@@ -119,7 +123,6 @@ public class UserService {
             throw new UserNotFoundException(id);
         }
     }
-
 
     private boolean hasFriendship(long userId, long friendId) {
         Set<Long> friends = friendsMap.getOrDefault(userId, Collections.emptySet());

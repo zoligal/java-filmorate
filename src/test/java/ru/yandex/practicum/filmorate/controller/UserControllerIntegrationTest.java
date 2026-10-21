@@ -28,14 +28,14 @@ class UserControllerIntegrationTest {
     private User createUserWithInvalidEmail() {
         User user = new User();
         user.setLogin("test");
-        user.setEmail("test.com"); // некорректный email
+        user.setEmail("test.com");
         user.setBirthday(LocalDate.now());
         return user;
     }
 
     private User createUserWithEmptyLogin() {
         User user = new User();
-        user.setLogin(""); // пустой логин
+        user.setLogin("");
         user.setEmail("user@example.com");
         user.setBirthday(LocalDate.of(1990, 1, 1));
         return user;
@@ -45,7 +45,7 @@ class UserControllerIntegrationTest {
         User user = new User();
         user.setLogin("future-user");
         user.setEmail("future-user@example.com");
-        user.setBirthday(LocalDate.now().plusDays(1)); // будущая дата
+        user.setBirthday(LocalDate.now().plusDays(1));
         return user;
     }
 
@@ -68,7 +68,7 @@ class UserControllerIntegrationTest {
     }
 
     @Test
-    void futureBdayBadRequest() throws Exception {
+    void futureBDayBadRequest() throws Exception {
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserWithFutureBirthday())))
