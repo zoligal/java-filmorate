@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -71,8 +72,10 @@ public class UserService {
         log.debug("Попытка удалить дружбу: userId={}, friendId={}", userId, friendId);
 
         if (!hasFriendship(userId, friendId)) {
-            log.warn("Попытка удалить несуществующую дружбу: userId={}, friendId={}. Ничего не делаем.", userId, friendId);
-            return;
+            log.warn("Попытка удалить несуществующую дружбу: userId={}, friendId={}. Выбрасываем исключение.", userId, friendId);
+            throw new FriendshipNotFoundException(
+                    String.format("Дружба между пользователем %d и пользователем %d не найдена", userId, friendId)
+            );
         }
 
         Set<Long> userFriends = friendsMap.get(userId);
@@ -89,6 +92,7 @@ public class UserService {
         cleanupIfEmpty(friendId);
         log.trace("Выполнена очистка пустых списков друзей после удаления: userId={}, friendId={}", userId, friendId);
     }
+
 
     public List<User> getFriends(long userId) {
         validateUserExists(userId);

@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+
 import java.time.LocalDateTime;
+
 
 @RestControllerAdvice
 @Slf4j
@@ -65,29 +67,54 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
-    @ExceptionHandler({
-            UserNotFoundException.class,
-            FriendshipNotFoundException.class
-    })
-    public ResponseEntity<Map<String, Object>> handleNotFound(RuntimeException exception) {
-        log.warn("404 Not Found: {}", exception.getMessage(), exception);
-        return new ResponseEntity<>(createErrorBody(HttpStatus.NOT_FOUND, exception.getMessage()), HttpStatus.NOT_FOUND);
+
+    /*@ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException ex) {
+        log.warn("404 Not Found (пользователь): {}", ex.getMessage(), ex);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());
+        body.put("timestamp", Instant.now());
+
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }*/
+
+    @ExceptionHandler(FriendshipNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException ex) {
+        log.warn("404 Not Found (дружба): {}", ex.getMessage(), ex);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());
+        body.put("timestamp", Instant.now());
+
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({
-            FilmNotFoundException.class,
-            LikeNotFoundException.class
-    })
-    public ResponseEntity<Map<String, Object>> handleNotFoundAsError(RuntimeException exception) {
-        log.warn("500 Internal Server Error: {}", exception.getMessage(), exception);
+    @ExceptionHandler(LikeNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleLikeNotFound(LikeNotFoundException ex) {
+        log.warn("404 Not Found (лайк): {}", ex.getMessage(), ex);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());
+        body.put("timestamp", Instant.now());
+
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    /*@ExceptionHandler(FilmNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleFilmNotFound(FilmNotFoundException ex) {
+        log.warn("500 Internal Server Error: {}", ex.getMessage(), ex);
 
         Map<String, Object> body = new HashMap<>();
         body.put("error", "Internal Server Error");
-        body.put("message", exception.getMessage());
+        body.put("message", ex.getMessage());
         body.put("timestamp", Instant.now());
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    }*/
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAnyException(Exception exception) {
@@ -99,6 +126,7 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleUserAlreadyExists(UserAlreadyExistsException exception) {

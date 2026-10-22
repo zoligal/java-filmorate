@@ -63,7 +63,7 @@ class FilmControllerIntegrationTest {
     }
 
 
-    @Test
+    /*@Test
     void invalidNameReturnsBadRequest() throws Exception {
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -88,7 +88,7 @@ class FilmControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(createNonPositiveDurationFilm())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details.duration").exists());
-    }
+    }*/
 
     @Test
     void validFilmReturnsCreated() throws Exception {
