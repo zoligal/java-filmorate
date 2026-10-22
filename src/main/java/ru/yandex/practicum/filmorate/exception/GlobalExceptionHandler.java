@@ -68,7 +68,6 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({
-            FilmNotFoundException.class,
             UserNotFoundException.class,
             FriendshipNotFoundException.class,
             LikeNotFoundException.class
@@ -77,6 +76,20 @@ public class GlobalExceptionHandler {
         log.warn("404 Not Found: {}", exception.getMessage(), exception);
         return new ResponseEntity<>(createErrorBody(HttpStatus.NOT_FOUND, exception.getMessage()), HttpStatus.NOT_FOUND);
     }
+
+
+    @ExceptionHandler(FilmNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleFilmNotFound(FilmNotFoundException ex) {
+        log.warn("500 Internal Server Error: {}", ex.getMessage(), ex);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Internal Server Error");
+        body.put("message", ex.getMessage());
+        body.put("timestamp", Instant.now());
+
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAnyException(Exception exception) {
