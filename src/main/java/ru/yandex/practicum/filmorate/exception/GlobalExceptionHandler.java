@@ -17,8 +17,6 @@ import java.time.LocalDateTime;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    // --- Специфичные ошибки валидации и аргументов ---
-
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException exception) {
         log.warn("Illegal argument: {}", exception.getMessage());
@@ -67,7 +65,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
-    // --- Хендлер для 404: ТОЛЬКО пользователи и дружба ---
     @ExceptionHandler({
             UserNotFoundException.class,
             FriendshipNotFoundException.class
@@ -77,7 +74,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(createErrorBody(HttpStatus.NOT_FOUND, exception.getMessage()), HttpStatus.NOT_FOUND);
     }
 
-    // --- Хендлер для 500: Фильмы и Лайки (закрывает пункты 11, 12, 13) ---
     @ExceptionHandler({
             FilmNotFoundException.class,
             LikeNotFoundException.class
@@ -93,7 +89,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // --- Общий запасной хендлер на случай любых других ошибок ---
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAnyException(Exception exception) {
         log.error("ПОЛНЫЙ СТЕК ОШИБКИ", exception);
