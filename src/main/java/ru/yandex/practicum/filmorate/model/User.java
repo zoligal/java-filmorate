@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-//import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
@@ -18,8 +18,8 @@ public class User {
     //@Email(message = "Email должен быть корректным")
     private String email;
 
-    //@NotBlank(message = "Логин не может быть пустым")
-    //@Pattern(regexp = "^\\S+$", message = "Логин не может содержать пробелы")
+    @NotBlank(message = "Логин не может быть пустым")
+    @Pattern(regexp = "^\\S+$", message = "Логин не может содержать пробелы")
     private String login;
 
     //@NotNull(message = "Дата рождения должна быть указана")

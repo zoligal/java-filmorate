@@ -1,15 +1,15 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import ru.yandex.practicum.filmorate.exception.BadRequestException;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -30,12 +30,14 @@ public class UserService {
 
     public List<User> getAll() {
         List<User> users = userStorage.getAll();
-        users.sort((u1, u2) -> Long.compare(u1.getId(), u2.getId()));
+        users.sort(Comparator.comparingLong(User::getId));
         return users;
     }
 
     public User add(User user) {
-        if (user == null) throw new IllegalArgumentException("Пользователь не должен быть равен null");
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь не должен быть равен null");
+        }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -52,20 +54,13 @@ public class UserService {
     }
 
     public void addFriend(long userId, long friendId) {
-        log.debug("Попытка добавить дружбу: userId={}, friendId={}", userId, friendId);
-
-        if (userId == friendId) {
-            log.warn("Попытка добавить себя в друзья: userId={}", userId);
-            throw new BadRequestException("Нельзя добавить себя в друзья");
-        }
-
-        validateUserExists(userId);
-        validateUserExists(friendId);
+        userStorage.getById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        userStorage.getById(friendId)
+                .orElseThrow(() -> new UserNotFoundException(friendId));
 
         friendsMap.computeIfAbsent(userId, k -> new HashSet<>()).add(friendId);
-        friendsMap.computeIfAbsent(friendId, k -> new HashSet<>()).add(userId);
-
-        log.info("Дружба между {} и {} успешно добавлена", userId, friendId);
+        log.debug("Дружба добавлена: {} -> {}", userId, friendId);
     }
 
     public void removeFriend(long userId, long friendId) {
@@ -79,26 +74,21 @@ public class UserService {
         }
 
         Set<Long> userFriends = friendsMap.get(userId);
-        Set<Long> friendFriends = friendsMap.get(friendId);
-
         if (userFriends != null) {
             userFriends.remove(friendId);
-        }
-        if (friendFriends != null) {
-            friendFriends.remove(userId);
+            if (userFriends.isEmpty()) {
+                friendsMap.remove(userId);
+            }
         }
 
-        cleanupIfEmpty(userId);
-        cleanupIfEmpty(friendId);
-        log.trace("Выполнена очистка пустых списков друзей после удаления: userId={}, friendId={}", userId, friendId);
+        log.trace("Выполнена очистка пустых списков друзей после удаления: userId={}", userId);
     }
-
 
     public List<User> getFriends(long userId) {
         validateUserExists(userId);
         Set<Long> friendIds = friendsMap.getOrDefault(userId, Collections.emptySet());
         return friendIds.stream()
-                .map(userStorage::getById)
+                .map(id -> userStorage.getById(id))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -116,7 +106,7 @@ public class UserService {
         commonIds.retainAll(friends2);
 
         return commonIds.stream()
-                .map(userStorage::getById)
+                .map(id -> userStorage.getById(id))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -124,19 +114,12 @@ public class UserService {
 
     private void validateUserExists(long id) {
         if (userStorage.getById(id).isEmpty()) {
-            throw new UserNotFoundException(id);
+            throw new UserNotFoundException("Пользователь с ID " + id + " не найден");
         }
     }
 
     private boolean hasFriendship(long userId, long friendId) {
         Set<Long> friends = friendsMap.getOrDefault(userId, Collections.emptySet());
         return friends.contains(friendId);
-    }
-
-    private void cleanupIfEmpty(long userId) {
-        Set<Long> set = friendsMap.get(userId);
-        if (set != null && set.isEmpty()) {
-            friendsMap.remove(userId);
-        }
     }
 }

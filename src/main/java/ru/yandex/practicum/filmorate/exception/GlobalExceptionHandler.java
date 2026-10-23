@@ -116,7 +116,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }*/
 
-    @ExceptionHandler(Exception.class)
+    /*@ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAnyException(Exception exception) {
         log.error("ПОЛНЫЙ СТЕК ОШИБКИ", exception);
 
@@ -125,7 +125,7 @@ public class GlobalExceptionHandler {
                 "message", "Произошла непредвиденная ошибка"
         );
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    }*/
 
 
     @ExceptionHandler(UserAlreadyExistsException.class)

@@ -41,19 +41,27 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable long id, @Valid @RequestBody User user) {
+        // Самое важное: запихиваем ID из URL внутрь объекта, чтобы он совпадал
+        if (user.getId() == null || user.getId() != id) {
+            user.setId(id);
+        }
+
         User updated = userService.update(user);
+
         log.info("Пользователь обновлён. ID: {}, Имя: {}", updated.getId(), updated.getName());
-        return updated;
+        return ResponseEntity.ok(updated);
     }
+
 
     @PutMapping("/{id}/friends/{friendId}")
     public ResponseEntity<Void> addFriend(@PathVariable long id, @PathVariable long friendId) {
         log.info("Пользователь {} добавляет в друзья {}", id, friendId);
-        userService.addFriend(id, friendId);
+        userService.addFriend(id, friendId); // должен кидать исключение, если ID нет
         return ResponseEntity.noContent().build();
     }
+
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<Void> removeFriend(@PathVariable long id, @PathVariable long friendId) {

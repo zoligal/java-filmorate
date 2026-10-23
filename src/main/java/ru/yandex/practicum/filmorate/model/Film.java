@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-//import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.*;
 //import ru.yandex.practicum.filmorate.validation.ReleaseDate;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -16,11 +16,11 @@ import java.util.Set;
 public class Film {
     Long id;
 
-    //@NotBlank(message = "Название фильма не может быть пустым")
+    @NotBlank(message = "Название фильма не может быть пустым")
     String name;
 
-    //@NotBlank(message = "Описание фильма не может быть пустым")
-    //@Size(max = 200, message = "Описание не должно превышать 200 символов")
+    @NotBlank(message = "Описание фильма не может быть пустым")
+    @Size(max = 200, message = "Описание не должно превышать 200 символов")
     String description;
 
     //@NotNull(message = "Необходимо указать дату релиза")
