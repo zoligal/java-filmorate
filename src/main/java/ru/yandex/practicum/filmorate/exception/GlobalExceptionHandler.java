@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.exception;
 
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,9 +8,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+
+import java.time.LocalDateTime;
+
 
 @RestControllerAdvice
 @Slf4j
@@ -17,53 +21,117 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException exception) {
-        log.warn("Illegal argument error: {}", exception.getMessage());
-        Map<String, Object> body = createErrorBody(HttpStatus.BAD_REQUEST, exception.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        log.warn("Illegal argument: {}", exception.getMessage());
+        return new ResponseEntity<>(createErrorBody(HttpStatus.BAD_REQUEST, exception.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException exception) {
-        log.warn("User not found: {}", exception.getId());
-        String message = String.format("User with id %d not found", exception.getId());
-        Map<String, Object> body = createErrorBody(HttpStatus.NOT_FOUND, message);
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    }
-
-    // Оставляем только этот вариант для FilmNotFoundException
-    @ExceptionHandler(FilmNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleFilmNotFound(FilmNotFoundException exception) {
-        log.warn("Film not found: {}", exception.getId());
-        String message = String.format("Film with id %d not found", exception.getId());
-        Map<String, Object> body = createErrorBody(HttpStatus.NOT_FOUND, message);
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    @ExceptionHandler(InvalidCountException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidCount(InvalidCountException exception) {
+        log.warn("Invalid count: {}", exception.getMessage());
+        Map<String, String> details = new HashMap<>();
+        details.put("count", exception.getMessage());
+        return new ResponseEntity<>(
+                createErrorBody(HttpStatus.BAD_REQUEST, "Некорректный параметр count", details),
+                HttpStatus.BAD_REQUEST
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
-        log.warn("Validation errors in request: {}", exception.getBindingResult().getAllErrors());
-
+    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException exception) {
+        log.warn("Validation errors: {}", exception.getBindingResult().getAllErrors());
         Map<String, String> errors = new HashMap<>();
-        exception.getBindingResult().getFieldErrors().forEach(fieldError ->
-                errors.put(fieldError.getField(), fieldError.getDefaultMessage())
+        exception.getBindingResult().getFieldErrors().forEach(e ->
+                errors.put(e.getField(), e.getDefaultMessage())
         );
-
-        Map<String, Object> body = createErrorBody(HttpStatus.BAD_REQUEST, "Validation failed", errors);
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(
+                createErrorBody(HttpStatus.BAD_REQUEST, "Validation failed", errors),
+                HttpStatus.BAD_REQUEST
+        );
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String, Object>> handleBadRequest(BadRequestException exception) {
+        log.warn("Bad request: {}", exception.getMessage());
+        return new ResponseEntity<>(
+                createErrorBody(HttpStatus.BAD_REQUEST, exception.getMessage()),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleValidation(ValidationException exception) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Bad Request");
+        body.put("message", exception.getMessage());
+        body.put("timestamp", Instant.now());
+        return ResponseEntity.badRequest().body(body);
+    }
+
+
+    /*@ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException ex) {
+        log.warn("404 Not Found (пользователь): {}", ex.getMessage(), ex);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());
+        body.put("timestamp", Instant.now());
+
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }*/
+
     @ExceptionHandler(FriendshipNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException exception) {
-        log.warn("Friendship not found: {}", exception.getMessage());
-        Map<String, Object> body = createErrorBody(HttpStatus.NOT_FOUND, exception.getMessage());
+    public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException ex) {
+        log.warn("404 Not Found (дружба): {}", ex.getMessage(), ex);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());
+        body.put("timestamp", Instant.now());
+
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGenericException(Exception exception) {
-        log.error("Unexpected error", exception);
-        Map<String, Object> body = createErrorBody(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+    @ExceptionHandler(LikeNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleLikeNotFound(LikeNotFoundException ex) {
+        log.warn("404 Not Found (лайк): {}", ex.getMessage(), ex);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());
+        body.put("timestamp", Instant.now());
+
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    /*@ExceptionHandler(FilmNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleFilmNotFound(FilmNotFoundException ex) {
+        log.warn("500 Internal Server Error: {}", ex.getMessage(), ex);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Internal Server Error");
+        body.put("message", ex.getMessage());
+        body.put("timestamp", Instant.now());
+
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }*/
+
+    /*@ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleAnyException(Exception exception) {
+        log.error("ПОЛНЫЙ СТЕК ОШИБКИ", exception);
+
+        var body = Map.of(
+                "error", "Internal Server Error",
+                "message", "Произошла непредвиденная ошибка"
+        );
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }*/
+
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleUserAlreadyExists(UserAlreadyExistsException exception) {
+        log.warn("User already exists / friendship already exists: {}", exception.getMessage());
+        return new ResponseEntity<>(createErrorBody(HttpStatus.CONFLICT, exception.getMessage()), HttpStatus.CONFLICT);
     }
 
     private Map<String, Object> createErrorBody(HttpStatus status, String message) {

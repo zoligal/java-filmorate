@@ -4,7 +4,7 @@ public class FilmNotFoundException extends RuntimeException {
     private final long id;
 
     public FilmNotFoundException(long id) {
-        super(String.format("Film with id %d not found", id));
+        super(String.format("Фильм с id %d не найден", id));
         this.id = id;
     }
 

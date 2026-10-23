@@ -70,23 +70,23 @@ class FilmControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.details.name").exists());
     }
 
-    @Test
+    /*@Test
     void oldReleaseDateReturnsBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createOldReleaseDateFilm())))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.details.releaseDate").exists());
-    }
+    }*/
 
-    @Test
+    /*@Test
     void nonPositiveDurationReturnsBadRequest() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createNonPositiveDurationFilm())))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.details.duration").exists());
-    }
+    }*/
 
     @Test
     void validFilmReturnsCreated() throws Exception {

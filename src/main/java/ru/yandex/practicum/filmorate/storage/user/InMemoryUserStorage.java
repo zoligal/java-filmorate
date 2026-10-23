@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserAlreadyExistsException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import org.springframework.stereotype.Repository;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentMap;
@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Component
 public class InMemoryUserStorage implements UserStorage {
 
     private final ConcurrentMap<Long, User> users = new ConcurrentHashMap<>();
-    private final AtomicLong nextId = new AtomicLong(1);
+    private final AtomicLong nextId = new AtomicLong(0);
 
 
     @Override
@@ -28,7 +28,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User add(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("User must not be null");
+            throw new IllegalArgumentException("Пользователь не должен быть равен null");
         }
 
         if (user.getId() != null) {
@@ -42,7 +42,7 @@ public class InMemoryUserStorage implements UserStorage {
 
             User existing = users.putIfAbsent(newId, newUser);
             if (existing != null) {
-                throw new UserAlreadyExistsException(String.format("User with id %d already exists", newId));
+                throw new UserAlreadyExistsException(String.format("Пользователь с id %d уже существует", newId));
             }
             return newUser;
         }
@@ -54,7 +54,7 @@ public class InMemoryUserStorage implements UserStorage {
             long newId = nextId.incrementAndGet();
 
             if (newId < lastId) {
-                throw new IllegalStateException("ID counter overflowed: no free IDs available");
+                throw new IllegalStateException("Счётчик ID переполнен: свободных ID нет");
             }
 
             User newUser = new User();
@@ -71,7 +71,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
 
         throw new IllegalStateException(String.format(
-                "Failed to generate a unique ID after %d attempts. The ID space may be exhausted or the storage is nearly full.",
+                "Не удалось сгенерировать уникальный ID после %d попыток.Пространство ID может быть исчерпано либо хранилище почти заполнено.",
                 maxAttempts
         ));
     }
@@ -79,7 +79,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(User user) {
         if (user == null || user.getId() == null) {
-            throw new IllegalArgumentException("User and its id must not be null");
+            throw new IllegalArgumentException("Пользователь и его ID не должны быть равны null");
         }
         if (!users.containsKey(user.getId())) {
             throw new UserNotFoundException(user.getId());
