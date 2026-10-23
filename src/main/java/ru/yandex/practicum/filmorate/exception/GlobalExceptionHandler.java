@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
     }
 
 
-    /*@ExceptionHandler(UserNotFoundException.class)
+    @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException ex) {
         log.warn("404 Not Found (пользователь): {}", ex.getMessage(), ex);
 
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
-    }*/
+    }
 
     @ExceptionHandler(FriendshipNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException ex) {
@@ -104,7 +104,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    /*@ExceptionHandler(FilmNotFoundException.class)
+    @ExceptionHandler(FilmNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleFilmNotFound(FilmNotFoundException ex) {
         log.warn("500 Internal Server Error: {}", ex.getMessage(), ex);
 
@@ -114,7 +114,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now());
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
+    }
 
     /*@ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleAnyException(Exception exception) {
