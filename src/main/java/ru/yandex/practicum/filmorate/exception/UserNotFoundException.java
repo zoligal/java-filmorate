@@ -1,12 +1,14 @@
 package ru.yandex.practicum.filmorate.exception;
 
 public class UserNotFoundException extends RuntimeException {
-    public UserNotFoundException(String message) {
-        super(message);
-    }
+    private final long id;
 
     public UserNotFoundException(long id) {
-        super(String.format("Пользователь с id %d не найден", id));
+        super(String.format("User with id %d not found", id));
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
     }
 }
-

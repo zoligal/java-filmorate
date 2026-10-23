@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -32,39 +33,46 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getById(@PathVariable long id) {
-        return userService.getById(id);
+        log.info("Запрос на получение пользователя с ID: {}", id);
+        return userService.getById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+            log.debug("Имя пустое, использовано имя логина: {}", user.getName());
+        }
+
         User created = userService.add(user);
+        log.info("Пользователь успешно добавлен. ID: {}, Email: {}", created.getId(), created.getEmail());
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable long id, @Valid @RequestBody User user) {
-        user.setId(id);
+    @PutMapping
+    public User updateUser(@RequestBody User user) {
+        if (user.getId() == null) {
+            log.warn("Попытка обновления пользователя без ID в теле запроса. User={}", user);
+            throw new IllegalArgumentException("В теле запроса не указан ID пользователя (поле id) — он обязателен для операции обновления");
+        }
 
         User updated = userService.update(user);
         log.info("Пользователь обновлён. ID: {}, Имя: {}", updated.getId(), updated.getName());
-        return ResponseEntity.ok(updated);
+        return updated;
     }
-
-
 
     @PutMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<Void> addFriend(@PathVariable long id, @PathVariable long friendId) {
+    public void addFriend(@PathVariable long id, @PathVariable long friendId) {
         log.info("Пользователь {} добавляет в друзья {}", id, friendId);
         userService.addFriend(id, friendId);
-        return ResponseEntity.noContent().build();
     }
 
-
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<Void> removeFriend(@PathVariable long id, @PathVariable long friendId) {
+    public void removeFriend(@PathVariable long id, @PathVariable long friendId) {
         log.info("Пользователь {} удаляет из друзей {}", id, friendId);
         userService.removeFriend(id, friendId);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/friends")
@@ -73,8 +81,10 @@ public class UserController {
         return userService.getFriends(id);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
-        return userService.getCommonFriends(id, otherId);
+    @GetMapping("/{id1}/friends/common/{id2}")
+    public List<User> getCommonFriends(@PathVariable long id1, @PathVariable long id2) {
+        log.info("Запрос общих друзей между {} и {}", id1, id2);
+        return userService.getCommonFriends(id1, id2);
     }
+
 }

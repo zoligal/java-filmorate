@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Component
+@Repository
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final ConcurrentHashMap<Long, Film> films = new ConcurrentHashMap<>();
@@ -24,7 +24,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film add(Film film) {
         if (film == null) {
-            throw new IllegalArgumentException("Фильм не должен быть равен null");
+            throw new IllegalArgumentException("Film must not be null");
         }
         long id = nextId.getAndIncrement();
         film.setId(id);
@@ -35,7 +35,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         if (film == null || film.getId() == null) {
-            throw new IllegalArgumentException("Фильм и его ID не должны быть null");
+            throw new IllegalArgumentException("Film and its id must not be null");
         }
 
         Long filmId = film.getId();
@@ -44,14 +44,8 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new FilmNotFoundException(filmId);
         }
 
-        Film existing = films.get(filmId);
-
-        if (film.getName() != null) existing.setName(film.getName());
-        if (film.getDescription() != null) existing.setDescription(film.getDescription());
-        if (film.getReleaseDate() != null) existing.setReleaseDate(film.getReleaseDate());
-        if (film.getDuration() != null) existing.setDuration(film.getDuration());
-
-        return existing;
+        films.put(filmId, film);
+        return film;
     }
 
 

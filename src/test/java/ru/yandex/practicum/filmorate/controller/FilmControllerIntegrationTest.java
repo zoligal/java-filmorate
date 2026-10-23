@@ -1,20 +1,19 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-
-import ru.yandex.practicum.filmorate.model.Film;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
+
+import ru.yandex.practicum.filmorate.model.Film;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -62,42 +61,40 @@ class FilmControllerIntegrationTest {
         return film;
     }
 
-
-    /*@Test
+    @Test
     void invalidNameReturnsBadRequest() throws Exception {
-        mockMvc.perform(post("/films")
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createInvalidNameFilm())))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.details.name").exists());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.details.name").exists());
     }
 
     @Test
     void oldReleaseDateReturnsBadRequest() throws Exception {
-        mockMvc.perform(post("/films")
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createOldReleaseDateFilm())))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.details.releaseDate").exists());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.details.releaseDate").exists());
     }
 
     @Test
-    void nonPosDurBadRequest() throws Exception {
-        mockMvc.perform(post("/films")
+    void nonPositiveDurationReturnsBadRequest() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createNonPositiveDurationFilm())))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.details.duration").exists());
-    }*/
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.details.duration").exists());
+    }
 
     @Test
     void validFilmReturnsCreated() throws Exception {
-        mockMvc.perform(post("/films")
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createValidFilm())))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Valid Movie"))
-                .andExpect(jsonPath("$.id").exists());
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Valid Movie"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists());
     }
-
 }
