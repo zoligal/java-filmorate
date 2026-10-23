@@ -27,8 +27,8 @@ public class Film {
     //@ReleaseDate(message = "Дата релиза не может быть раньше 28.12.1895")
     LocalDate releaseDate;
 
-    //@NotNull(message = "Необходимо указать продолжительность фильма")
-    //@Positive(message = "Продолжительность должна быть положительной")
+    @NotNull(message = "Необходимо указать продолжительность фильма")
+    @Positive(message = "Продолжительность должна быть положительной")
     Integer duration;
 
     private Set<Long> likes = new HashSet<>();

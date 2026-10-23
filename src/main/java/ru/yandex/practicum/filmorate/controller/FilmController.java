@@ -39,11 +39,12 @@ public class FilmController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Film> updateFilm(@PathVariable long id, @Valid @RequestBody Film film) {
+        film.setId(id);
         Film updated = filmService.update(id, film);
-
         log.info("Фильм обновлён. ID: {}, Название: {}", updated.getId(), updated.getName());
         return ResponseEntity.ok(updated);
     }
+
 
 
     @GetMapping("/{id}")
