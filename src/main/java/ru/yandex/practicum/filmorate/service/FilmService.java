@@ -68,14 +68,14 @@ public class FilmService {
         log.debug("Лайк успешно поставлен: filmId={}, userId={}", filmId, userId);
     }
 
-    public Film update(long id, Film filmDto) {
+    public Film update(long id, Film film) {
         Film existing = filmStorage.getById(id)
                 .orElseThrow(() -> new FilmNotFoundException(id));
 
-        existing.setName(filmDto.getName());
-        existing.setDescription(filmDto.getDescription());
-        existing.setReleaseDate(filmDto.getReleaseDate());
-        existing.setDuration(filmDto.getDuration());
+        existing.setName(film.getName());
+        existing.setDescription(film.getDescription());
+        existing.setReleaseDate(film.getReleaseDate());
+        existing.setDuration(film.getDuration());
 
         return filmStorage.update(existing);
     }
