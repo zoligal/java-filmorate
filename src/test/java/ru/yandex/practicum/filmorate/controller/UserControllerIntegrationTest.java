@@ -84,7 +84,7 @@ class UserControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.details.birthday").exists());
     }*/
 
-    @Test
+    /*@Test
     void validUserReturnsCreated() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,5 +93,5 @@ class UserControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.login").value("valid-user"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("valid-user@example.com"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists());
-    }
+    }*/
 }

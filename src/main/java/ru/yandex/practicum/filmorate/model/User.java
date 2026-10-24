@@ -11,11 +11,11 @@ import java.time.LocalDate;
 public class User {
     private Long id;
 
-    //@NotBlank(message = "Имя не может быть пустым")
+    @NotBlank(message = "Имя не может быть пустым")
     private String name;
 
-    //@NotBlank(message = "Электронная почта не может быть пустой")
-    //@Email(message = "Email должен быть корректным")
+    @NotBlank(message = "Электронная почта не может быть пустой")
+    @Email(message = "Email должен быть корректным")
     private String email;
 
     @NotBlank(message = "Логин не может быть пустым")
