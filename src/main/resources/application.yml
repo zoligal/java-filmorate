@@ -1,0 +1,6 @@
+logging:
+  level:
+    org.zalando.logbook: TRACE
+    ru.yandex.practicum.filmorate: DEBUG
+    root: DEBUG
+    org.springframework: WARN
