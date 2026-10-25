@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -43,28 +42,26 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable long id, @Valid @RequestBody User user) {
-
+        log.info("Update called with id={}, method=PUT", id);
         User existingUser = userService.getById(id);
-
+        if (existingUser == null) {
+            return ResponseEntity.notFound().build();
+        }
         existingUser.setName(user.getName());
         existingUser.setLogin(user.getLogin());
         existingUser.setEmail(user.getEmail());
         existingUser.setBirthday(user.getBirthday());
-
         User updated = userService.update(existingUser);
-
         log.info("Пользователь обновлён. ID: {}, Имя: {}", updated.getId(), updated.getName());
-
         return ResponseEntity.ok(updated);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public ResponseEntity<Void> addFriend(@PathVariable long id, @PathVariable long friendId) {
         log.info("Пользователь {} добавляет в друзья {}", id, friendId);
-        userService.addFriend(id, friendId); // должен кидать исключение, если ID нет
+        userService.addFriend(id, friendId);
         return ResponseEntity.noContent().build();
     }
-
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<Void> removeFriend(@PathVariable long id, @PathVariable long friendId) {
