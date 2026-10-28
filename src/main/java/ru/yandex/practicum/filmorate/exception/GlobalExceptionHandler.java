@@ -106,14 +106,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FilmNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleFilmNotFound(FilmNotFoundException ex) {
-        log.warn("500 Internal Server Error: {}", ex.getMessage(), ex);
+        log.warn("404 Not Found (фильм): {}", ex.getMessage(), ex);
 
         Map<String, Object> body = new HashMap<>();
-        body.put("error", "Internal Server Error");
+        body.put("error", "Not Found");
         body.put("message", ex.getMessage());
         body.put("timestamp", Instant.now());
 
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
     /*@ExceptionHandler(Exception.class)
