@@ -29,18 +29,19 @@ public class UserController {
         return userService.getAll();
     }
 
-    @GetMapping("/{id}")
-    public User getById(@PathVariable long id) {
-        return userService.getById(id);
-    }
-
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         User created = userService.add(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping("/{id}")
+    @GetMapping("/{id}")
+    public User getById(@PathVariable long id) {
+        return userService.getById(id);
+    }
+
+    //@PutMapping("/{id}")
+    @PutMapping
     public ResponseEntity<User> updateUser(@PathVariable long id, @Valid @RequestBody User user) {
         log.info("Update called with id={}, method=PUT", id);
         User existingUser = userService.getById(id);
