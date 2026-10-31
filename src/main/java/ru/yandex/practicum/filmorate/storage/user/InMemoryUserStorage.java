@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+//import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -76,7 +76,7 @@ public class InMemoryUserStorage implements UserStorage {
         ));
     }
 
-    @Override
+    /*@Override
     public User update(User user) {
         if (user == null || user.getId() == null) {
             throw new IllegalArgumentException("Пользователь и его ID не должны быть равны null");
@@ -86,7 +86,23 @@ public class InMemoryUserStorage implements UserStorage {
         }
         users.put(user.getId(), user);
         return user;
+    }*/
+
+    @Override
+    public User update(User user) {
+        Long id = user.getId();
+        if (id == null || !users.containsKey(id)) {
+            return null;
+        }
+        users.put(id, user);
+        return users.get(id);
     }
+
+    /*@Override
+    public Optional<User> findById(Long id) {
+        return Optional.ofNullable(users.get(id));
+    }*/
+
 
     @Override
     public void delete(long id) {

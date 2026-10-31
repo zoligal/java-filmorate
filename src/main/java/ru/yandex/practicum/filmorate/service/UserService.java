@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -44,9 +45,29 @@ public class UserService {
         return userStorage.add(user);
     }
 
-    public User update(User user) {
+    /*public User update(User user) {
         return userStorage.update(user);
+    }*/
+
+    public User update(User user) {
+        if (user.getId() == null) {
+            throw new ValidationException("Для обновления требуется идентификатор пользователя");
+        }
+
+        Optional<User> existingOpt = userStorage.getById(user.getId());
+        if (existingOpt.isEmpty()) {
+            throw new UserNotFoundException("Пользователь с идентификатором " + user.getId() + " не найден");
+        }
+        User existing = existingOpt.get();
+
+        existing.setName(user.getName());
+        existing.setLogin(user.getLogin());
+        existing.setEmail(user.getEmail());
+        existing.setBirthday(user.getBirthday());
+
+        return userStorage.update(existing);
     }
+
 
     public User getById(long id) {
         return userStorage.getById(id)

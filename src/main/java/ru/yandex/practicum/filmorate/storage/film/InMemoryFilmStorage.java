@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+//import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    @Override
+    /*@Override
     public Film update(Film film) {
         if (film == null || film.getId() == null) {
             throw new IllegalArgumentException("Фильм и его ID не должны быть null");
@@ -52,8 +52,22 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film.getDuration() != null) existing.setDuration(film.getDuration());
 
         return existing;
+    }*/
+
+    @Override
+    public Film update(Film film) {
+        Long id = film.getId();
+        if (id == null) {
+            return null;
+        }
+        films.put(id, film);
+        return films.get(id);
     }
 
+    /* @Override
+    public Optional<Film> getById(Long id) {
+        return Optional.ofNullable(films.get(id));
+    }*/
 
     @Override
     public List<Film> getAll() {
