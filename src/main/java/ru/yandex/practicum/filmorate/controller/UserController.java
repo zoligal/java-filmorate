@@ -40,23 +40,6 @@ public class UserController {
         return userService.getById(id);
     }
 
-    //@PutMapping("/{id}")
-    /*@PutMapping
-    public ResponseEntity<User> updateUser(@PathVariable long id, @Valid @RequestBody User user) {
-        log.info("Update called with id={}, method=PUT", id);
-        User existingUser = userService.getById(id);
-        if (existingUser == null) {
-            return ResponseEntity.notFound().build();
-        }
-        existingUser.setName(user.getName());
-        existingUser.setLogin(user.getLogin());
-        existingUser.setEmail(user.getEmail());
-        existingUser.setBirthday(user.getBirthday());
-        User updated = userService.update(existingUser);
-        log.info("Пользователь обновлён. ID: {}, Имя: {}", updated.getId(), updated.getName());
-        return ResponseEntity.ok(updated);
-    }*/
-
     @PutMapping
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         log.info("Update called with id={}", user.getId());

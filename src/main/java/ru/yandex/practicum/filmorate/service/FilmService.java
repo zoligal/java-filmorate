@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-//import ru.yandex.practicum.filmorate.exception.InvalidCountException;
 import ru.yandex.practicum.filmorate.exception.LikeNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -69,18 +68,6 @@ public class FilmService {
         log.debug("Лайк успешно поставлен: filmId={}, userId={}", filmId, userId);
     }
 
-    /*public Film update(long id, Film film) {
-        Film existing = filmStorage.getById(id)
-                .orElseThrow(() -> new FilmNotFoundException(id));
-
-        existing.setName(film.getName());
-        existing.setDescription(film.getDescription());
-        existing.setReleaseDate(film.getReleaseDate());
-        existing.setDuration(film.getDuration());
-
-        return filmStorage.update(existing);
-    }*/
-
     public Film update(Film film) {
         if (film.getId() == null) {
             throw new ValidationException("Для обновления требуется идентификатор фильма");
@@ -122,26 +109,6 @@ public class FilmService {
                 .limit(limit)
                 .collect(Collectors.toList());
     }
-
-    /*public List<Film> getTopNFilms(int count) {
-        log.debug("Запрос топ-N фильмов: count={}", count);
-
-        if (count <= 0) {
-            log.warn("Некорректный параметр count={}. Должен быть > 0", count);
-            throw new InvalidCountException("Параметр count должен быть положительным числом");
-        }
-
-        List<Film> top = filmStorage.getAll().stream()
-                .sorted((f1, f2) -> Integer.compare(
-                        getLikesCount(f2.getId()),
-                        getLikesCount(f1.getId())
-                ))
-                .limit(count)
-                .collect(Collectors.toList());
-
-        log.debug("Вернули топ-{} фильмов по лайкам", top.size());
-        return top;
-    }*/
 
     public int getLikesCount(long filmId) {
         return likesMap.getOrDefault(filmId, Collections.emptySet()).size();

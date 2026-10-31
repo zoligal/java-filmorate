@@ -69,64 +69,52 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException ex) {
-        log.warn("404 Not Found (пользователь): {}", ex.getMessage(), ex);
+    public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException exception) {
+        log.warn("404 Not Found (пользователь): {}", exception.getMessage(), exception);
 
         Map<String, Object> body = new HashMap<>();
         body.put("error", "Not Found");
-        body.put("message", ex.getMessage());
+        body.put("message", exception.getMessage());
         body.put("timestamp", Instant.now());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(FriendshipNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException ex) {
-        log.warn("404 Not Found (дружба): {}", ex.getMessage(), ex);
+    public ResponseEntity<Map<String, Object>> handleFriendshipNotFound(FriendshipNotFoundException exception) {
+        log.warn("404 Not Found (дружба): {}", exception.getMessage(), exception);
 
         Map<String, Object> body = new HashMap<>();
         body.put("error", "Not Found");
-        body.put("message", ex.getMessage());
+        body.put("message", exception.getMessage());
         body.put("timestamp", Instant.now());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(LikeNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleLikeNotFound(LikeNotFoundException ex) {
-        log.warn("404 Not Found (лайк): {}", ex.getMessage(), ex);
+    public ResponseEntity<Map<String, Object>> handleLikeNotFound(LikeNotFoundException exception) {
+        log.warn("404 Not Found (лайк): {}", exception.getMessage(), exception);
 
         Map<String, Object> body = new HashMap<>();
         body.put("error", "Not Found");
-        body.put("message", ex.getMessage());
+        body.put("message", exception.getMessage());
         body.put("timestamp", Instant.now());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(FilmNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleFilmNotFound(FilmNotFoundException ex) {
-        log.warn("404 Not Found (фильм): {}", ex.getMessage(), ex);
+    public ResponseEntity<Map<String, Object>> handleFilmNotFound(FilmNotFoundException exception) {
+        log.warn("404 Not Found (фильм): {}", exception.getMessage(), exception);
 
         Map<String, Object> body = new HashMap<>();
         body.put("error", "Not Found");
-        body.put("message", ex.getMessage());
+        body.put("message", exception.getMessage());
         body.put("timestamp", Instant.now());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
-
-    /*@ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleAnyException(Exception exception) {
-        log.error("ПОЛНЫЙ СТЕК ОШИБКИ", exception);
-
-        var body = Map.of(
-                "error", "Internal Server Error",
-                "message", "Произошла непредвиденная ошибка"
-        );
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
-    }*/
-
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleUserAlreadyExists(UserAlreadyExistsException exception) {

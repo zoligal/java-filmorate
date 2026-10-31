@@ -45,10 +45,6 @@ public class UserService {
         return userStorage.add(user);
     }
 
-    /*public User update(User user) {
-        return userStorage.update(user);
-    }*/
-
     public User update(User user) {
         if (user.getId() == null) {
             throw new ValidationException("Для обновления требуется идентификатор пользователя");
@@ -56,7 +52,7 @@ public class UserService {
 
         Optional<User> existingOpt = userStorage.getById(user.getId());
         if (existingOpt.isEmpty()) {
-            throw new UserNotFoundException("Пользователь с идентификатором " + user.getId() + " не найден");
+            throw new UserNotFoundException(String.format("Пользователь с идентификатором %d не найден", user.getId()));
         }
         User existing = existingOpt.get();
 
@@ -67,7 +63,6 @@ public class UserService {
 
         return userStorage.update(existing);
     }
-
 
     public User getById(long id) {
         return userStorage.getById(id)
@@ -80,7 +75,13 @@ public class UserService {
         userStorage.getById(friendId)
                 .orElseThrow(() -> new UserNotFoundException(friendId));
 
+        if (userId == friendId) {
+            throw new IllegalArgumentException("Пользователь не может добавить себя в друзья");
+        }
+
         friendsMap.computeIfAbsent(userId, k -> new HashSet<>()).add(friendId);
+        friendsMap.computeIfAbsent(friendId, k -> new HashSet<>()).add(userId);
+
         log.debug("Дружба добавлена: {} -> {}", userId, friendId);
     }
 
