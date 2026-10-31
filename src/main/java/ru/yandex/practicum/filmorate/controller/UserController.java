@@ -61,16 +61,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    /*@GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable long id) {
-        log.info("Запрос списка друзей для пользователя {}", id);
-        return userService.getFriends(id);
-    }*/
-
     @GetMapping("/{id}/friends")
     public ResponseEntity<List<User>> getFriends(@PathVariable long id) {
         List<User> friends = userService.getFriends(id);
-        if (friends == null || friends.isEmpty()) {
+
+        if (friends.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 

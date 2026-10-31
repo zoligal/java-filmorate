@@ -114,7 +114,6 @@ public class UserService {
     }
 
     public List<User> getFriends(long userId) {
-        validateUserExists(userId);
         Set<Long> friendIds = friendsMap.getOrDefault(userId, Collections.emptySet());
         return friendIds.stream()
                 .map(id -> userStorage.getById(id))
