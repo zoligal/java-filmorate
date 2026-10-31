@@ -65,9 +65,9 @@ public class UserController {
     public ResponseEntity<List<User>> getFriends(@PathVariable long id) {
         List<User> friends = userService.getFriends(id);
 
-        if (friends.isEmpty()) {
+        /*if (friends.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        }*/
 
         return ResponseEntity.ok(friends);
     }
