@@ -103,7 +103,14 @@ public class UserService {
             }
         }
 
-        log.trace("Выполнена очистка пустых списков друзей после удаления: userId={}", userId);
+        Set<Long> friendFriends = friendsMap.get(friendId);
+        if (friendFriends != null) {
+            friendFriends.remove(userId);
+            if (friendFriends.isEmpty()) {
+                friendsMap.remove(friendId);
+            }
+        }
+        log.trace("Дружба между {} и {} успешно удалена.", userId, friendId);
     }
 
     public List<User> getFriends(long userId) {
