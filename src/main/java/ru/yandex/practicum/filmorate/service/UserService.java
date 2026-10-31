@@ -114,7 +114,13 @@ public class UserService {
     }
 
     public List<User> getFriends(long userId) {
+        Optional<User> userOptional = userStorage.getById(userId);
+
+        if (userOptional.isEmpty()) {
+            throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
+        }
         Set<Long> friendIds = friendsMap.getOrDefault(userId, Collections.emptySet());
+
         return friendIds.stream()
                 .map(id -> userStorage.getById(id))
                 .filter(Optional::isPresent)
