@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @EqualsAndHashCode(of = "id")
 public class User {
     private Long id;
+
+    @NotBlank(message = "Имя не может быть пустым")
     private String name;
 
     @NotBlank(message = "Электронная почта не может быть пустой")
