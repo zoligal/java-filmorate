@@ -70,7 +70,6 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public ResponseEntity<List<User>> getFriends(@PathVariable long id) {
         List<User> friends = userService.getFriends(id);
-        
         if (friends == null || friends.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
