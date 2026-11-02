@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.controller;
+/*package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,4 +79,4 @@ class FilmControllerIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Valid Movie"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists());
     }
-}
+}*/

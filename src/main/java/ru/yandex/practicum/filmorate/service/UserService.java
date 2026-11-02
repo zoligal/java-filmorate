@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -88,10 +89,15 @@ public class UserService {
             throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
         }
 
-        if (!hasFriendship(userId, friendId)) {
+        /*if (!hasFriendship(userId, friendId)) {
             log.warn("Дружба между {} и {} не найдена. Ничего не делаем, операция считается успешной.", userId, friendId);
             return;
+        }*/
+        if (!hasFriendship(userId, friendId)) {
+            throw new FriendshipNotFoundException(
+                    String.format("Дружба между пользователем %d и пользователем %d не найдена", userId, friendId));
         }
+
 
         Set<Long> userFriends = friendsMap.get(userId);
         if (userFriends != null) {
