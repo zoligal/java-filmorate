@@ -148,6 +148,16 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public void deleteUser(long id) {
+        Optional<User> userOptional = userStorage.getById(id);
+
+        if (userOptional.isEmpty()) {
+            throw new UserNotFoundException("Пользователь с ID " + id + " не найден");
+        }
+
+        userStorage.delete(id);
+    }
+
     private void validateUserExists(long id) {
         if (userStorage.getById(id).isEmpty()) {
             throw new UserNotFoundException("Пользователь с ID " + id + " не найден");

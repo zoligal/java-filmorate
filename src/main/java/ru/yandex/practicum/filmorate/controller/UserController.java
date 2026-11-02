@@ -62,6 +62,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable long id) {
+        log.info("Удаление пользователя с ID: {}", id);
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable long id) {
         return userService.getFriends(id);
