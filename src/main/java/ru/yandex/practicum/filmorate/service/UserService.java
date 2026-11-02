@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -84,10 +83,11 @@ public class UserService {
         log.debug("Попытка удалить дружбу: userId={}, friendId={}", userId, friendId);
 
         if (!hasFriendship(userId, friendId)) {
-            log.warn("Попытка удалить несуществующую дружбу: userId={}, friendId={}. Выбрасываем исключение.", userId, friendId);
-            throw new FriendshipNotFoundException(
+            log.warn("Попытка удалить несуществующую дружбу: userId={}, friendId={}. Ничего не делаем.", userId, friendId);
+            /*throw new FriendshipNotFoundException(
                     String.format("Дружба между пользователем %d и пользователем %d не найдена", userId, friendId)
-            );
+            );*/
+            return;
         }
 
         Set<Long> userFriends = friendsMap.get(userId);
@@ -108,7 +108,7 @@ public class UserService {
         log.trace("Дружба между {} и {} успешно удалена.", userId, friendId);
     }
 
-   /* public List<User> getFriends(long userId) {
+    public List<User> getFriends(long userId) {
         Optional<User> userOptional = userStorage.getById(userId);
         if (userOptional.isEmpty()) {
             throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
@@ -121,25 +121,6 @@ public class UserService {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
-    }*/
-
-    public List<User> getFriends(long userId) {
-        Optional<User> userOptional = userStorage.getById(userId);
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
-        }
-
-        Set<Long> friendIds = friendsMap.getOrDefault(userId, Collections.emptySet());
-
-        List<User> friends = new ArrayList<>();
-        for (Long friendId : friendIds) {
-            Optional<User> friendOpt = userStorage.getById(friendId);
-            if (friendOpt.isPresent()) {
-                friends.add(friendOpt.get());
-            }
-        }
-
-        return friends;
     }
 
 

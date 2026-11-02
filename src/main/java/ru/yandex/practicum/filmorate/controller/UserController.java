@@ -1,20 +1,16 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-import ru.yandex.practicum.filmorate.exception.GlobalExceptionHandler; // пока тут
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
 
-@Import(GlobalExceptionHandler.class) // пока тут
 @RestController
 @RequestMapping("/users")
 @Slf4j
@@ -65,15 +61,9 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    //Пробую if (friends.isEmpty()) {
-    //            throw new UserNotFoundException("У пользователя нет друзей");
-    //        }
     @GetMapping("/{id}/friends")
     public ResponseEntity<List<User>> getFriends(@PathVariable long id) {
         List<User> friends = userService.getFriends(id);
-        if (friends.isEmpty()) {
-            throw new UserNotFoundException("У пользователя нет друзей");
-        }
         return ResponseEntity.ok(friends);
     }
 
