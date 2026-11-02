@@ -27,7 +27,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User add(User user) {
-        System.out.println("!!! STORAGE LOG: Пытаюсь добавить пользователя. ID из объекта: " + user.getId());
         if (user == null) {
             throw new IllegalArgumentException("Пользователь не должен быть равен null");
         }
@@ -45,7 +44,6 @@ public class InMemoryUserStorage implements UserStorage {
             if (existing != null) {
                 throw new UserAlreadyExistsException(String.format("Пользователь с id %d уже существует", newId));
             }
-            System.out.println("!!! УСПЕХ: Пользователь ДОБАВЛЕН в хранилище! ID: " + newId + ", Имя: " + newUser.getName());
             return newUser;
         }
 
