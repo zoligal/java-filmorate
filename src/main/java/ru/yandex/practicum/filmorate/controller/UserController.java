@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+
 import ru.yandex.practicum.filmorate.exception.FriendshipNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -67,14 +68,12 @@ public class UserController {
         List<User> friends = userService.getFriends(id);
 
         if (friends.isEmpty()) {
-            throw new FriendshipNotFoundException(
-                    "У пользователя с id " + id + " нет друзей"
-            );
+            throw new FriendshipNotFoundException("У пользователя с id " + id + " нет друзей");
         }
 
         return friends;
     }
-    
+
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
         return userService.getCommonFriends(id, otherId);
