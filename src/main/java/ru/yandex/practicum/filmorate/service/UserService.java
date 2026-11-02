@@ -80,49 +80,6 @@ public class UserService {
         log.debug("Дружба добавлена: {} -> {}", userId, friendId);
     }
 
-    /*public void removeFriend(long userId, long friendId) {
-        log.debug("Попытка удалить дружбу: userId={}, friendId={}", userId, friendId);
-
-        if (!hasFriendship(userId, friendId)) {
-            log.warn("Попытка удалить несуществующую дружбу: userId={}, friendId={}. Выбрасываем исключение.", userId, friendId);
-            throw new FriendshipNotFoundException(
-                    String.format("Дружба между пользователем %d и пользователем %d не найдена", userId, friendId)
-            );
-        }
-
-        Set<Long> userFriends = friendsMap.get(userId);
-        if (userFriends != null) {
-            userFriends.remove(friendId);
-            if (userFriends.isEmpty()) {
-                friendsMap.remove(userId);
-            }
-        }
-
-        Set<Long> friendFriends = friendsMap.get(friendId);
-        if (friendFriends != null) {
-            friendFriends.remove(userId);
-            if (friendFriends.isEmpty()) {
-                friendsMap.remove(friendId);
-            }
-        }
-        log.trace("Дружба между {} и {} успешно удалена.", userId, friendId);
-    }
-
-    public List<User> getFriends(long userId) {
-        Optional<User> userOptional = userStorage.getById(userId);
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
-        }
-
-        Set<Long> friendIds = friendsMap.getOrDefault(userId, Collections.emptySet());
-
-        return friendIds.stream()
-                .map(id -> userStorage.getById(id))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-    }*/
-
     public void removeFriend(long userId, long friendId) {
         log.debug("Попытка удалить дружбу: userId={}, friendId={}", userId, friendId);
 
