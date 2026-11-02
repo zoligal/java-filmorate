@@ -9,12 +9,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -113,7 +108,7 @@ public class UserService {
         log.trace("Дружба между {} и {} успешно удалена.", userId, friendId);
     }
 
-    public List<User> getFriends(long userId) {
+   /* public List<User> getFriends(long userId) {
         Optional<User> userOptional = userStorage.getById(userId);
         if (userOptional.isEmpty()) {
             throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
@@ -126,7 +121,27 @@ public class UserService {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+    }*/
+
+    public List<User> getFriends(long userId) {
+        Optional<User> userOptional = userStorage.getById(userId);
+        if (userOptional.isEmpty()) {
+            throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
+        }
+
+        Set<Long> friendIds = friendsMap.getOrDefault(userId, Collections.emptySet());
+
+        List<User> friends = new ArrayList<>();
+        for (Long friendId : friendIds) {
+            Optional<User> friendOpt = userStorage.getById(friendId);
+            if (friendOpt.isPresent()) {
+                friends.add(friendOpt.get());
+            }
+        }
+
+        return friends;
     }
+
 
     public List<User> getCommonFriends(long userId1, long userId2) {
         log.debug("Запрос общих друзей: userId={}, otherId={}", userId1, userId2);
