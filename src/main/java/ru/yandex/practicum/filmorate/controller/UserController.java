@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
-import ru.yandex.practicum.filmorate.dto.FriendsResponse;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -62,19 +61,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    /*@GetMapping("/{id}/friends")
+    @GetMapping("/{id}/friends")
     public ResponseEntity<List<User>> getFriends(@PathVariable long id) {
         List<User> friends = userService.getFriends(id);
         return ResponseEntity.ok(friends);
-    }*/
-
-    @GetMapping("/{id}/friends")
-    public ResponseEntity<FriendsResponse> getFriends(@PathVariable long id) {
-        List<User> friends = userService.getFriends(id);
-        FriendsResponse response = new FriendsResponse(friends, friends.size());
-        return ResponseEntity.ok(response);
     }
-
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
