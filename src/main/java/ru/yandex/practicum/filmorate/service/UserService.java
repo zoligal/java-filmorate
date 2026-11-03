@@ -83,21 +83,14 @@ public class UserService {
     public void removeFriend(long userId, long friendId) {
         log.debug("Попытка удалить дружбу: userId={}, friendId={}", userId, friendId);
 
-        Optional<User> userOptional = userStorage.getById(userId);
-        if (userOptional.isEmpty()) {
-            log.warn("Пользователь с ID {} не найден. Выбрасываем исключение.", userId);
-            throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
-        }
+        // Проверка существования пользователей
+        userStorage.getByIdOrFail(userId);
+        userStorage.getByIdOrFail(friendId);
 
-        /*if (!hasFriendship(userId, friendId)) {
-            log.warn("Дружба между {} и {} не найдена. Ничего не делаем, операция считается успешной.", userId, friendId);
-            return;
-        }*/
         if (!hasFriendship(userId, friendId)) {
             throw new FriendshipNotFoundException(
                     String.format("Дружба между пользователем %d и пользователем %d не найдена", userId, friendId));
         }
-
 
         Set<Long> userFriends = friendsMap.get(userId);
         if (userFriends != null) {
@@ -114,8 +107,10 @@ public class UserService {
                 friendsMap.remove(friendId);
             }
         }
+
         log.trace("Дружба между {} и {} успешно удалена.", userId, friendId);
     }
+
 
     public List<User> getFriends(long userId) {
         Optional<User> userOptional = userStorage.getById(userId);
