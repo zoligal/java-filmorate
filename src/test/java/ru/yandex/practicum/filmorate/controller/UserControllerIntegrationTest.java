@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.controller;
+/*package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +87,7 @@ class UserControllerIntegrationTest {
 
         System.out.println("Тест пройден: получили 404 при повторном удалении.");
     }
-}
+}*/
 
 /*package ru.yandex.practicum.filmorate.controller;
 

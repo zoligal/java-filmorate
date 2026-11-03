@@ -88,8 +88,8 @@ public class UserService {
         userStorage.getByIdOrFail(friendId);
 
         if (!hasFriendship(userId, friendId)) {
-            throw new FriendshipNotFoundException(
-                    String.format("Дружба между пользователем %d и пользователем %d не найдена", userId, friendId));
+            log.debug("Дружбы между {} и {} нет. Операция считается успешной.", userId, friendId);
+            return;
         }
 
         Set<Long> userFriends = friendsMap.get(userId);
