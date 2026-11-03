@@ -2,6 +2,9 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.FieldDefaults;
+import lombok.AccessLevel;
+
 import jakarta.validation.constraints.*;
 import ru.yandex.practicum.filmorate.validation.ReleaseDate;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -13,6 +16,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = "id")
 @JsonIgnoreProperties(ignoreUnknown = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Film {
     Long id;
 
@@ -31,5 +35,5 @@ public class Film {
     @Positive(message = "Продолжительность должна быть положительной")
     Integer duration;
 
-    private Set<Long> likes = new HashSet<>();
+    Set<Long> likes = new HashSet<>();
 }

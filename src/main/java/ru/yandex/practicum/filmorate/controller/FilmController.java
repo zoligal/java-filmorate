@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.constant.ApiPathConstants;
 
 import java.util.List;
 
@@ -49,14 +50,14 @@ public class FilmController {
         return filmService.getById(id);
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping(ApiPathConstants.SEGMENT_LIKE)
     public ResponseEntity<Void> addLike(@PathVariable Long id, @PathVariable Long userId) {
         System.out.println(">>> PUT ЗАПРОШЕН: id=" + id);
         filmService.addLike(id, userId);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping(ApiPathConstants.SEGMENT_LIKE)
     public ResponseEntity<Void> removeLike(@PathVariable Long id, @PathVariable Long userId) {
         filmService.removeLike(id, userId);
         return ResponseEntity.noContent().build();
@@ -67,5 +68,4 @@ public class FilmController {
         List<Film> popular = filmService.getPopular(count);
         return ResponseEntity.ok(popular);
     }
-
 }

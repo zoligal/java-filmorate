@@ -2,27 +2,31 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.FieldDefaults;
+import lombok.AccessLevel;
+
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
 @Data
 @EqualsAndHashCode(of = "id")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
-    private Long id;
+    Long id;
 
     @NotBlank(message = "Имя не может быть пустым")
-    private String name;
+    String name;
 
     @NotBlank(message = "Электронная почта не может быть пустой")
     @Email(message = "Email должен быть корректным")
-    private String email;
+    String email;
 
     @NotBlank(message = "Логин не может быть пустым")
     @Pattern(regexp = "^\\S+$", message = "Логин не может содержать пробелы")
-    private String login;
+    String login;
 
     @NotNull(message = "Дата рождения должна быть указана")
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
-    private LocalDate birthday;
+    LocalDate birthday;
 }

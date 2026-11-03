@@ -54,7 +54,9 @@ public class FilmService {
                 .orElseThrow(() -> new FilmNotFoundException(filmId));
 
         User user = userStorage.getById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID " + userId + " не найден"));
+                .orElseThrow(() -> new UserNotFoundException(
+                        String.format("Пользователь с ID %d не найден", userId)
+                ));
 
         if (film.getLikes().contains(userId)) {
             throw new IllegalArgumentException("Пользователь уже поставил лайк этому фильму");
