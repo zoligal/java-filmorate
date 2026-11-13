@@ -50,10 +50,4 @@ WHERE u.id NOT IN (1, 2)
 
 ## Запуск
 
-Для запуска проекта используйте Maven Wrapper (он уже есть в репозитории):
-
-- Windows: `mvnw.cmd spring-boot:run`
-- Linux/macOS: `./mvnw spring-boot:run`
-
-Или запустите главный класс `FilmorateApplication` прямо из IDE (IntelliJ IDEA).
-
+Запустите главный класс `FilmorateApplication` (с методом `main`) прямо из IntelliJ IDEA — IDE сама соберёт проект с помощью встроенного Maven.
