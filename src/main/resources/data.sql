@@ -1,14 +1,12 @@
+MERGE INTO mpa (id, name) KEY(name) VALUES (1, 'G');
+MERGE INTO mpa (id, name) KEY(name) VALUES (2, 'PG');
+MERGE INTO mpa (id, name) KEY(name) VALUES (3, 'PG-13');
+MERGE INTO mpa (id, name) KEY(name) VALUES (4, 'R');
+MERGE INTO mpa (id, name) KEY(name) VALUES (5, 'NC-17');
 
-INSERT INTO mpa (name) VALUES ('G');
-INSERT INTO mpa (name) VALUES ('PG');
-INSERT INTO mpa (name) VALUES ('PG-13');
-INSERT INTO mpa (name) VALUES ('R');
-INSERT INTO mpa (name) VALUES ('NC-17');
-
-
-INSERT INTO genres (name) VALUES ('Комедия');
-INSERT INTO genres (name) VALUES ('Драма');
-INSERT INTO genres (name) VALUES ('Мультфильм');
-INSERT INTO genres (name) VALUES ('Триллер');
-INSERT INTO genres (name) VALUES ('Документальный');
-INSERT INTO genres (name) VALUES ('Боевик');
+MERGE INTO genres (id, name) KEY(name) VALUES (1, 'Комедия');
+MERGE INTO genres (id, name) KEY(name) VALUES (2, 'Драма');
+MERGE INTO genres (id, name) KEY(name) VALUES (3, 'Мультфильм');
+MERGE INTO genres (id, name) KEY(name) VALUES (4, 'Триллер');
+MERGE INTO genres (id, name) KEY(name) VALUES (5, 'Документальный');
+MERGE INTO genres (id, name) KEY(name) VALUES (6, 'Боевик');
