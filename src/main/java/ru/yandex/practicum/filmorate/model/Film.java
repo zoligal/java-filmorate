@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -19,6 +20,9 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Film {
     Long id;
+    private Mpa mpa;
+    private List<Genre> genres;
+
 
     @NotBlank(message = "Название фильма не может быть пустым")
     String name;
@@ -37,7 +41,4 @@ public class Film {
 
     Set<Long> likes = new HashSet<>();
 
-    private Set<Long> genreIds = new HashSet<>();
-
-    private Long mpaRatingId;
 }

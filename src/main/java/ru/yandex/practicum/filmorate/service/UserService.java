@@ -2,31 +2,27 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 public class UserService {
 
     private final UserStorage userStorage;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
-    private final ConcurrentHashMap<Long, Set<Long>> friendsMap = new ConcurrentHashMap<>();
 
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
     public List<User> getAll() {
-        List<User> users = userStorage.getAll();
-        users.sort(Comparator.comparingLong(User::getId));
-        return users;
+        return userStorage.getAll();
     }
 
     public User add(User user) {
@@ -44,11 +40,9 @@ public class UserService {
             throw new ValidationException("Для обновления требуется идентификатор пользователя");
         }
 
-        Optional<User> existingOpt = userStorage.getById(user.getId());
-        if (existingOpt.isEmpty()) {
-            throw new UserNotFoundException(String.format("Пользователь с идентификатором %d не найден", user.getId()));
-        }
-        User existing = existingOpt.get();
+        User existing = userStorage.getById(user.getId())
+                .orElseThrow(() -> new UserNotFoundException(
+                        String.format("Пользователь с идентификатором %d не найден", user.getId())));
 
         existing.setName(user.getName());
         existing.setLogin(user.getLogin());
@@ -64,105 +58,33 @@ public class UserService {
     }
 
     public void addFriend(long userId, long friendId) {
-        userStorage.getById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
-        userStorage.getById(friendId)
-                .orElseThrow(() -> new UserNotFoundException(friendId));
-
         if (userId == friendId) {
             throw new IllegalArgumentException("Пользователь не может добавить себя в друзья");
         }
-
-        friendsMap.computeIfAbsent(userId, k -> new HashSet<>()).add(friendId);
-        friendsMap.computeIfAbsent(friendId, k -> new HashSet<>()).add(userId);
-
-        log.debug("Дружба добавлена: {} -> {}", userId, friendId);
+        userStorage.getByIdOrFail(userId);
+        userStorage.getByIdOrFail(friendId);
+        userStorage.addFriend(userId, friendId);
     }
 
     public void removeFriend(long userId, long friendId) {
-        log.debug("Попытка удалить дружбу: userId={}, friendId={}", userId, friendId);
-
-        // Проверка существования пользователей
         userStorage.getByIdOrFail(userId);
         userStorage.getByIdOrFail(friendId);
-
-        if (!hasFriendship(userId, friendId)) {
-            log.debug("Дружбы между {} и {} нет. Операция считается успешной.", userId, friendId);
-            return;
-        }
-
-        Set<Long> userFriends = friendsMap.get(userId);
-        if (userFriends != null) {
-            userFriends.remove(friendId);
-            if (userFriends.isEmpty()) {
-                friendsMap.remove(userId);
-            }
-        }
-
-        Set<Long> friendFriends = friendsMap.get(friendId);
-        if (friendFriends != null) {
-            friendFriends.remove(userId);
-            if (friendFriends.isEmpty()) {
-                friendsMap.remove(friendId);
-            }
-        }
-
-        log.trace("Дружба между {} и {} успешно удалена.", userId, friendId);
+        userStorage.removeFriend(userId, friendId);
     }
-
 
     public List<User> getFriends(long userId) {
-        Optional<User> userOptional = userStorage.getById(userId);
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException("Пользователь с ID " + userId + " не найден");
-        }
-
-        Set<Long> friendIds = friendsMap.getOrDefault(userId, Collections.emptySet());
-
-        return friendIds.stream()
-                .map(id -> userStorage.getById(id))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+        userStorage.getByIdOrFail(userId);
+        return userStorage.getFriends(userId);
     }
 
-
     public List<User> getCommonFriends(long userId1, long userId2) {
-        log.debug("Запрос общих друзей: userId={}, otherId={}", userId1, userId2);
-        validateUserExists(userId1);
-        validateUserExists(userId2);
-
-        Set<Long> friends1 = friendsMap.getOrDefault(userId1, Collections.emptySet());
-        Set<Long> friends2 = friendsMap.getOrDefault(userId2, Collections.emptySet());
-
-        Set<Long> commonIds = new HashSet<>(friends1);
-        commonIds.retainAll(friends2);
-
-        return commonIds.stream()
-                .map(id -> userStorage.getById(id))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
+        userStorage.getByIdOrFail(userId1);
+        userStorage.getByIdOrFail(userId2);
+        return userStorage.getCommonFriends(userId1, userId2);
     }
 
     public void deleteUser(long id) {
-        Optional<User> userOptional = userStorage.getById(id);
-
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException("Пользователь с ID " + id + " не найден");
-        }
-
+        userStorage.getByIdOrFail(id);
         userStorage.delete(id);
-    }
-
-    private void validateUserExists(long id) {
-        if (userStorage.getById(id).isEmpty()) {
-            throw new UserNotFoundException("Пользователь с ID " + id + " не найден");
-        }
-    }
-
-    private boolean hasFriendship(long userId, long friendId) {
-        Set<Long> friends = friendsMap.getOrDefault(userId, Collections.emptySet());
-        return friends.contains(friendId);
     }
 }
