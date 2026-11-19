@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.FieldDefaults;
-//import java.util.concurrent.atomic.AtomicReference;
 
 import static lombok.AccessLevel.PRIVATE;
 

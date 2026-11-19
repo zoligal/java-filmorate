@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
                 errors.put(e.getField(), e.getDefaultMessage())
         );
         return new ResponseEntity<>(
-                createErrorBody(HttpStatus.BAD_REQUEST, "Validation failed", errors),
+                createErrorBody(HttpStatus.BAD_REQUEST, "Ошибка валидации", errors),
                 HttpStatus.BAD_REQUEST
         );
     }
@@ -114,6 +114,12 @@ public class GlobalExceptionHandler {
         body.put("timestamp", Instant.now());
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(NotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "Not Found", "message", e.getMessage()));
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)

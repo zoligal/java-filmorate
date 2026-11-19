@@ -14,8 +14,6 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     Long id;
-
-    @NotBlank(message = "Имя не может быть пустым")
     String name;
 
     @NotBlank(message = "Электронная почта не может быть пустой")
