@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
                 errors.put(e.getField(), e.getDefaultMessage())
         );
         return new ResponseEntity<>(
-                createErrorBody(HttpStatus.BAD_REQUEST, "Validation failed", errors),
+                createErrorBody(HttpStatus.BAD_REQUEST, "Ошибка валидации", errors),
                 HttpStatus.BAD_REQUEST
         );
     }
